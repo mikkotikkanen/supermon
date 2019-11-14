@@ -1,0 +1,12 @@
+{
+  "dependencies": {
+    "no-change": "^1.0.0",
+    "to-be-updated": "^2.0.0",
+    "to-be-removed": "^3.0.0"
+  },
+  "devDependencies": {
+    "dev-no-change": "^1.0.0",
+    "dev-to-be-updated": "^2.0.0",
+    "dev-to-be-removed": "^3.0.0"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "name": "nodewatcher",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "bin": {
+    "dockagemon": "./bin/cli"
+  },
+  "engines": {
+    "node": ">=8"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "chokidar": "^3.3.0",
+    "tree-kill": "^1.2.1",
+    "yargs": "^14.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^12.12.6",
+    "@types/yargs": "^13.0.3",
+    "typescript": "^3.7.2"
+  },
+  "scripts": {
+    "dev": "tsc --watch",
+    "test-server": "node ./dist/bin/cli.js ./tests/apps/test-server.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc",
+    "prepublishOnly": "npm run build"
+  }
+}
