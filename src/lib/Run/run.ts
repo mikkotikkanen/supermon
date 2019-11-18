@@ -14,6 +14,71 @@ const runPropsDefaults: IRunProps = {
 }
 
 
+export class Run {
+  private command: string;
+  private props: IRunProps;
+  events = new EventEmitter();
+
+  constructor(command: string, props?: IRunProps) {
+
+    const defaultedProps = Object.assign({}, runPropsDefaults, props);
+
+    this.command = command;
+    this.props = defaultedProps;
+
+    this.events.on(Events.START, () => {
+      // this.execute();
+    });
+
+    // Push execute function to call stack so that event emitter can be returned immediately
+    if (defaultedProps.autostart) {
+      // setTimeout(execute, 0, command, defaultedProps);
+      this.events.emit(Events.START);
+    }
+    console.log('Run constructor');
+  }
+
+  execute() {
+    let isBeingKilled = false;
+
+    // Start child process
+    const child = spawn(this.command, {
+      cwd: this.props.cwd,
+      shell: true,
+      stdio: 'inherit',
+    });
+
+    this.events.emit(Events.STARTED);
+
+    child.on('close', (code: Number) => {
+      console.log('Run, close event fired', code);
+      if (!isBeingKilled) {
+        console.log('Run, firing CLOSED event');
+        this.events.emit(Events.CLOSED, code);
+      }
+    });
+
+    this.events.on(Events.KILL, () => {
+      console.log('Run, KILL event fired');
+      if (!child) {
+        throw new Error("Can't kill child process, no process is running.");
+      } else {
+        // Make sure we wait until all processes are killed before sending CLOSED event
+        isBeingKilled = true;
+        kill(child.pid, 'SIGKILL', () => {
+          isBeingKilled = false;
+          child.emit('close', 0);
+        });
+      }
+    });
+
+    this.events.emit(Events.STARTED);
+  }
+}
+
+
+
+
 let events: EventEmitter;
 let child: ChildProcess;
 let isBeingKilled = false;
@@ -34,7 +99,9 @@ const execute = (command: string, props: IRunProps) => {
   });
 
   child.on('close', (code: Number) => {
+    console.log('run, close event fired', code);
     if (!isBeingKilled) {
+      console.log('run, firing CLOSED event');
       events.emit(Events.CLOSED, code);
     }
   });
@@ -60,6 +127,7 @@ export const run = (command: string, props?: IRunProps) => {
   });
 
   events.on(Events.KILL, () => {
+    console.log('run, KILL event fired');
     if (!child) {
       throw new Error("Can't kill child process, no process is running.");
     } else {

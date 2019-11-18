@@ -14,8 +14,7 @@
   "license": "ISC",
   "dependencies": {
     "chokidar": "^3.3.0",
-    "tree-kill": "^1.2.1",
-    "yargs": "^14.2.0"
+    "tree-kill": "^1.2.1"
   },
   "devDependencies": {
     "@types/node": "^12.12.6",
