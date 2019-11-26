@@ -15,9 +15,6 @@ export const watch = () => {
     ignored: ['./node_modules', './dist', './docs'],
   });
   watcher.on('change', () => {
-    console.log('');
-    console.log('Files changed, restarting...');
-    console.log('');
     events.emit(Events.CHANGED);
   });
 

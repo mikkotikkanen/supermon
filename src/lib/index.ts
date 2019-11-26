@@ -4,6 +4,7 @@ import { runRestartable, RunEvents } from './Run';
 import { install, InstallEvents } from './Install';
 import kill from 'tree-kill';
 
+
 export interface ILibProps {
   executable: string
 }
@@ -16,25 +17,31 @@ let isInstalling = false;
 
 export default (args: ILibProps) => {
 
-  // Run watcher
+  // Setup watcher
   watchEvents = watch();
   watchEvents.on(WatchEvents.CHANGED, () => {
     // Only start emitting watch events once the child process is running
     if (isStarted && !isInstalling) {
-      isInstalling = true;
+      console.log('');
+      console.log('Files changed, restarting...');
+      console.log('');
+
       installEvents.emit(InstallEvents.INSTALL);
     }
   });
 
 
-  // Run installer
+  // Setup installer
   installEvents = install();
-  installEvents.emit(InstallEvents.INSTALL);
+  installEvents.on(InstallEvents.INSTALL, () => {
+    isInstalling = true;
+  });
   installEvents.on(InstallEvents.INSTALLED, () => {
     isInstalling = false;
 
     // Only trigger restart if child process has been started already
     if (isStarted) {
+      isStarted = false;
       runEvents.emit(RunEvents.RESTART);
     } else {
       runEvents.emit(RunEvents.START);
@@ -42,7 +49,7 @@ export default (args: ILibProps) => {
   });
 
 
-  // Run the requested command
+  // Setup the requested command
   runEvents = runRestartable(`node ${args.executable}`, { autostart: false });
   runEvents.on(RunEvents.STARTED, () => {
     isStarted = true;
@@ -54,6 +61,9 @@ export default (args: ILibProps) => {
     // Make sure we clean up all dangling processes
     kill(process.pid);
   });
+
+  // Start with install
+  installEvents.emit(InstallEvents.INSTALL);
 }
 
 

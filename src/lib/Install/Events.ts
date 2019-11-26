@@ -1,4 +1,4 @@
 export const enum Events {
-  INSTALLED = 'stopped',
+  INSTALLED = 'installed',
   INSTALL = 'install',
 }
