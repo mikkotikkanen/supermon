@@ -1,5 +1,5 @@
 import { EventEmitter } from 'events';
-import { run, IRunProps } from "./run";
+import { Run, IRunProps } from "./run";
 import { Events } from './Events';
 
 
@@ -8,48 +8,39 @@ let runEvents: EventEmitter;
 let isRestarting = false;
 
 
-/**
- * Run and setup events for restartable command
- *
- * @param command Command string
- * @param props Command properties
- */
-const runAndSetEvents = (command: string, props?: IRunProps) => {
-  runEvents = run(command, props);
+export const runRestartable = (command: string, props?: IRunProps) => {
+  const run = new Run(command);
 
-  runEvents.on(Events.STARTED, () => {
+  run.events.on(Events.STARTED, () => {
     if (isRestarting) {
       isRestarting = false;
     }
     events.emit(Events.STARTED);
   });
 
-  runEvents.on(Events.CLOSED, (code) => {
+  run.events.on(Events.CLOSED, (code) => {
     if (isRestarting) {
       if (props) {
         props.autostart = true;
       }
-      runAndSetEvents(command, props);
+
+      events.emit(Events.START);
     } else {
       events.emit(Events.CLOSED, code)
     }
   });
-}
-
-
-export const runRestartable = (command: string, props?: IRunProps) => {
 
   // Set main event emitter events
-  events.on(Events.START, () => runEvents.emit(Events.START));
+  events.on(Events.START, () => {
+    run.execute();
+  });
 
   events.on(Events.RESTART, () => {
     isRestarting = true;
-    runEvents.emit(Events.KILL);
+    run.events.emit(Events.KILL);
   });
 
-  events.on(Events.KILL, () => runEvents.emit(Events.KILL));
-
-  setTimeout(runAndSetEvents, 0, command, props);
+  events.on(Events.KILL, () => run.events.emit(Events.KILL));
 
   return events;
 };

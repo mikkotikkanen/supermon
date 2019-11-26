@@ -4,7 +4,6 @@ import { runRestartable, RunEvents } from './Run';
 import { install, InstallEvents } from './Install';
 import updateNodeModules from './updateNodeModules';
 import kill from 'tree-kill';
-import { SIGINT, POINT_CONVERSION_COMPRESSED } from 'constants';
 
 export interface ILibProps {
   executable: string
@@ -33,7 +32,6 @@ export default (args: ILibProps) => {
   installEvents = install();
   installEvents.emit(InstallEvents.INSTALL);
   installEvents.on(InstallEvents.INSTALLED, () => {
-    console.log('is installed');
     isInstalling = false;
 
     // Only trigger restart if child process has been started already
@@ -54,15 +52,14 @@ export default (args: ILibProps) => {
     console.log('');
     console.log('Process exited.', code);
 
-    process.exit(code);
-    // kill(process.pid); // Maybe use tree-kill to make sure there are no rogue processes left
+    // Make sure we clean up all dangling processes
+    kill(process.pid);
   });
 }
 
 
-// Make sure everything is killed when process exits
+// Make sure we trigger kill events to both main and child processes
 const cleanup = () => {
-  console.log('cleanup');
   runEvents.emit(RunEvents.KILL);
   runEvents.emit(RunEvents.CLOSED, 0);
 }

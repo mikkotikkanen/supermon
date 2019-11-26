@@ -17,6 +17,9 @@ const runPropsDefaults: IRunProps = {
 export class Run {
   private command: string;
   private props: IRunProps;
+  // private child: ChildProcess; //
+  private pid = 0;
+  private isBeingKilled = false;
   events = new EventEmitter();
 
   constructor(command: string, props?: IRunProps) {
@@ -30,45 +33,42 @@ export class Run {
       // this.execute();
     });
 
+    this.events.on(Events.KILL, () => {
+      if (!this.pid) {
+        throw new Error("Can't kill child process, no process is running.");
+      } else {
+        // Make sure we wait until all processes are killed before sending CLOSED event
+        this.isBeingKilled = true;
+        kill(this.pid, 'SIGKILL', () => {
+          this.isBeingKilled = false;
+          // child.emit('close', 0);
+          this.events.emit(Events.CLOSED, 0);
+        });
+      }
+    });
+
     // Push execute function to call stack so that event emitter can be returned immediately
     if (defaultedProps.autostart) {
       // setTimeout(execute, 0, command, defaultedProps);
       this.events.emit(Events.START);
     }
-    console.log('Run constructor');
   }
 
   execute() {
-    let isBeingKilled = false;
 
     // Start child process
-    const child = spawn(this.command, {
+    const child = spawn(this.command, { // child event handlers are left behind after restart
       cwd: this.props.cwd,
       shell: true,
       stdio: 'inherit',
     });
-
-    this.events.emit(Events.STARTED);
+    this.pid = child.pid;
 
     child.on('close', (code: Number) => {
-      console.log('Run, close event fired', code);
-      if (!isBeingKilled) {
-        console.log('Run, firing CLOSED event');
-        this.events.emit(Events.CLOSED, code);
-      }
-    });
-
-    this.events.on(Events.KILL, () => {
-      console.log('Run, KILL event fired');
-      if (!child) {
-        throw new Error("Can't kill child process, no process is running.");
-      } else {
-        // Make sure we wait until all processes are killed before sending CLOSED event
-        isBeingKilled = true;
-        kill(child.pid, 'SIGKILL', () => {
-          isBeingKilled = false;
-          child.emit('close', 0);
-        });
+      if (this.pid) {
+        if (!this.isBeingKilled) {
+          this.events.emit(Events.CLOSED, code);
+        }
       }
     });
 
@@ -76,77 +76,6 @@ export class Run {
   }
 }
 
-
-
-
-let events: EventEmitter;
-let child: ChildProcess;
-let isBeingKilled = false;
-
-
-/**
- * Execute the command
- *
- * @param command Command to run
- * @param props Command properties
- */
-const execute = (command: string, props: IRunProps) => {
-  // Start child process
-  child = spawn(command, {
-    cwd: props.cwd,
-    shell: true,
-    stdio: 'inherit',
-  });
-
-  child.on('close', (code: Number) => {
-    console.log('run, close event fired', code);
-    if (!isBeingKilled) {
-      console.log('run, firing CLOSED event');
-      events.emit(Events.CLOSED, code);
-    }
-  });
-
-  events.emit(Events.STARTED);
-}
-
-
-/**
- * Run the given command
- *
- * @param command Command to run
- * @param props Command properties
- */
-export const run = (command: string, props?: IRunProps) => {
-  const defaultedProps = Object.assign({}, runPropsDefaults, props);
-
-  // Create event emitter
-  events = new EventEmitter();
-
-  events.on(Events.START, () => {
-    execute(command, defaultedProps);
-  });
-
-  events.on(Events.KILL, () => {
-    console.log('run, KILL event fired');
-    if (!child) {
-      throw new Error("Can't kill child process, no process is running.");
-    } else {
-      // Make sure we wait until all processes are killed before sending CLOSED event
-      isBeingKilled = true;
-      kill(child.pid, 'SIGKILL', () => {
-        isBeingKilled = false;
-        child.emit('close', 0);
-      });
-    }
-  });
-
-  // Push execute function to call stack so that event emitter can be returned immediately
-  if (defaultedProps.autostart) {
-    setTimeout(execute, 0, command, defaultedProps);
-  }
-
-  return events;
-}
 
 
 // Make sure child is killed when process exits

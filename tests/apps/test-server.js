@@ -1,5 +1,5 @@
 const http = require('http')
-const port = 3000
+const port = 3001
 
 const requestHandler = (request, response) => {
   console.log(request.url)
@@ -17,4 +17,3 @@ server.listen(port, (err) => {
 })
 
 process.on('close', server.close);
-

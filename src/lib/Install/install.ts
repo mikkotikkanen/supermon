@@ -19,7 +19,6 @@ const storedPackageJSONPath = join(cwd, 'package-stored.json');
  * @param diff Diff to run the install against
  */
 const runInstall = (title: string, diff: Diff[]) => new Promise((resolve, reject) => {
-  console.log('install diff:', diff);
   if (diff.length) {
     console.log(`${title}`);
     const installString = diff.map(module => `${module.name}@${module.version}`).join(' ');
@@ -28,16 +27,13 @@ const runInstall = (title: string, diff: Diff[]) => new Promise((resolve, reject
         console.log('');
       })
       .then(() => {
-        console.log('runInstall, resolving');
         resolve();
       })
       .catch((err) => {
-        console.log('runInstall, rejecting', err);
         reject(err);
       });
 
   } else {
-    console.log('nothing to install, resolving');
     resolve();
   }
 });
@@ -62,16 +58,13 @@ export const install = () => {
       const diffDependencies = DependencyDiff(storedPackageJSON.dependencies, packageJSON.dependencies);
       // const diffDevDependencies = dependencyDiff(storedPackageJSON.devDependencies, packageJSON.devDependencies);
       // const diffPeerDependencies = dependencyDiff(storedPackageJSON.peerDependencies, packageJSON.peerDependencies);
-      console.log('diff', diffDependencies);
       new Promise(resolve => resolve())
         .then(() => runInstall('Installing missing dependencies...', diffDependencies.added))
         .then(() => {
-          console.log('installed');
           events.emit(Events.INSTALLED);
         })
         .catch(() => {
           throw new Error('Failed to install dependencies.');
-          console.log('catch');
         });
 
     } else {
