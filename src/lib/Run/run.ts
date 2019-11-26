@@ -1,4 +1,4 @@
-import { spawn, ChildProcess } from 'child_process';
+import { spawn } from 'child_process';
 import { EventEmitter } from 'events';
 import kill from 'tree-kill';
 import { Events } from './Events';
@@ -17,7 +17,6 @@ const runPropsDefaults: IRunProps = {
 export class Run {
   private command: string;
   private props: IRunProps;
-  // private child: ChildProcess; //
   private pid = 0;
   private isBeingKilled = false;
   events = new EventEmitter();
@@ -41,15 +40,12 @@ export class Run {
         this.isBeingKilled = true;
         kill(this.pid, 'SIGKILL', () => {
           this.isBeingKilled = false;
-          // child.emit('close', 0);
           this.events.emit(Events.CLOSED, 0);
         });
       }
     });
 
-    // Push execute function to call stack so that event emitter can be returned immediately
     if (defaultedProps.autostart) {
-      // setTimeout(execute, 0, command, defaultedProps);
       this.events.emit(Events.START);
     }
   }

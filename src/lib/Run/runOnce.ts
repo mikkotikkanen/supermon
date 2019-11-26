@@ -4,7 +4,6 @@ import { Events } from "./Events";
 export const runOnce = (command: string) => new Promise((resolve, reject) => {
   const run = new Run(command);
 
-  // const runEvents = run(command);
   run.events.on(Events.CLOSED, (code) => {
     if (code) {
       reject(code);

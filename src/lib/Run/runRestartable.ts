@@ -4,7 +4,6 @@ import { Events } from './Events';
 
 
 const events = new EventEmitter();
-let runEvents: EventEmitter;
 let isRestarting = false;
 
 
