@@ -15,14 +15,13 @@ const storedPackageJSONPath = join(cwd, 'package-stored.json');
 /**
  * Run npm install with logging against diff array
  *
- * @param title Logging section title
  * @param diff Diff to run the install against
+ * @param extraParams Extra params for npm install
  */
-const runInstall = (title: string, diff: Diff[]) => new Promise((resolve, reject) => {
+const runNpmCommand = (cmd: string, diff: Diff[], extraParams: string = '') => new Promise((resolve, reject) => {
   if (diff.length) {
-    console.log(`${title}`);
     const installString = diff.map(module => `${module.name}@${module.version}`).join(' ');
-    runOnce(`npm install ${installString} --no-audit`)
+    runOnce(`npm ${cmd} ${installString} --no-audit ${extraParams}`)
       .then(() => {
         console.log('');
       })
@@ -43,7 +42,6 @@ export const install = () => {
   events = new EventEmitter();
 
   events.on(Events.INSTALL, () => {
-
     // Load main package.json
     const packageJSON = LoadPackageJSON(packageJSONPath);
     if (!packageJSON) {
@@ -55,11 +53,20 @@ export const install = () => {
 
     // Compare dependencies
     if (storedPackageJSON) {
+      // Do diff between stored and current package.json
       const diffDependencies = DependencyDiff(storedPackageJSON.dependencies, packageJSON.dependencies);
-      // const diffDevDependencies = dependencyDiff(storedPackageJSON.devDependencies, packageJSON.devDependencies);
-      // const diffPeerDependencies = dependencyDiff(storedPackageJSON.peerDependencies, packageJSON.peerDependencies);
+      const diffDevDependencies = DependencyDiff(storedPackageJSON.devDependencies, packageJSON.devDependencies);
+
+      // Collect missing and extra dependencies
+      let missingDependencies: Diff[] = [];
+      missingDependencies = missingDependencies.concat(diffDependencies.added, diffDependencies.changed, diffDevDependencies.added, diffDevDependencies.changed);
+      let extraDependencies: Diff[] = [];
+      extraDependencies = extraDependencies.concat(diffDependencies.removed, diffDevDependencies.removed);
+
       new Promise(resolve => resolve())
-        .then(() => runInstall('Installing missing dependencies...', diffDependencies.added))
+        .then(() => { console.log('Installing missing dependencies...'); })
+        .then(() => runNpmCommand('install', missingDependencies))
+        .then(() => runNpmCommand('uninstall', extraDependencies))
         .then(() => {
           events.emit(Events.INSTALLED);
         })
