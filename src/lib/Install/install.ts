@@ -1,9 +1,9 @@
 import { EventEmitter } from "events"
-import { Events } from "./Events";
+import { join } from "path";
 import { runOnce } from "../Run";
+import { Events } from "./Events";
 import DependencyDiff, { Diff } from "./DependencyDiff";
 import LoadPackageJSON from "./LoadPackageJSON";
-import { join } from "path";
 
 
 let events: EventEmitter;
