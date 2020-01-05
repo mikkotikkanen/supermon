@@ -9,3 +9,4 @@ TODO:
 - first run sync (npm install, npm prune)?
 - store package.json somewhere
 - set updatenotifier to use the same custom directory
+- unbounce change events
