@@ -1,5 +1,5 @@
 import { EventEmitter } from 'events';
-import { Run, IRunProps } from "./run";
+import { Run, IRunProps } from "./Run";
 import { Events } from './Events';
 
 

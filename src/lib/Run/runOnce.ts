@@ -1,4 +1,4 @@
-import { Run } from "./run";
+import { Run } from "./Run";
 import { Events } from "./Events";
 
 export const runOnce = (command: string) => new Promise((resolve, reject) => {

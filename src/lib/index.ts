@@ -67,14 +67,20 @@ export default (args: ILibProps) => {
 }
 
 
-// Make sure we trigger kill events to both main and child processes
+/**
+ * Setup signal handling
+ */
 const cleanup = () => {
+  // Make sure we trigger kill events to both main and child processes
   runEvents.emit(RunEvents.KILL);
   runEvents.emit(RunEvents.CLOSED, 0);
 }
 
-const termSignals: NodeJS.Signals[] = ['SIGINT', 'SIGUSR1', 'SIGUSR2', 'SIGTERM'];
-termSignals.forEach((eventType) => {
+// Set system signals
+const sysSignals: NodeJS.Signals[] = ['SIGINT', 'SIGUSR1', 'SIGUSR2', 'SIGTERM'];
+sysSignals.forEach((eventType) => {
   process.on(eventType, cleanup);
 });
+
+// Set process exit event (not valid system signal so set it separately)
 process.on('exit', cleanup);
