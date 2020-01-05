@@ -1,16 +1,5 @@
-import { readFileSync, statSync, existsSync } from "fs";
-
-export interface IPackageJSON extends Object {
-  readonly name: string;
-  readonly version?: string,
-  readonly dependencies: IDependencyMap,
-  readonly devDependencies: IDependencyMap,
-  readonly peerDependencies: IDependencyMap,
-}
-
-export interface IDependencyMap {
-  [dependencyName: string]: string;
-}
+import { readFileSync, existsSync } from "fs";
+import { IPackageJSON } from "./IPackageJSON";
 
 export default (filename: string) => {
   if (!existsSync(filename)) {
