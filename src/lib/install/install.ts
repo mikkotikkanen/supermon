@@ -4,6 +4,7 @@ import { runOnce } from "../Run";
 import { Events } from "./Events";
 import DependencyDiff, { Diff } from "./dependencyDiff";
 import LoadPackageJSON from "./loadPackageJSON";
+import { set, get } from "../store";
 
 
 let events: EventEmitter;
@@ -49,7 +50,7 @@ export const install = () => {
     }
 
     // Load stored package.json
-    const storedPackageJSON = LoadPackageJSON(storedPackageJSONPath);
+    const storedPackageJSON = get(packageJSON.name);
 
     // Compare dependencies
     if (storedPackageJSON) {
@@ -63,16 +64,26 @@ export const install = () => {
       let extraDependencies: Diff[] = [];
       extraDependencies = extraDependencies.concat(diffDependencies.removed, diffDevDependencies.removed);
 
-      new Promise(resolve => resolve())
-        .then(() => { console.log('Installing missing dependencies...'); })
-        .then(() => runNpmCommand('install', missingDependencies))
-        .then(() => runNpmCommand('uninstall', extraDependencies))
-        .then(() => {
+      if (missingDependencies.length || extraDependencies.length) {
+        new Promise(resolve => resolve())
+          .then(() => { console.log('Installing missing dependencies...'); })
+          .then(() => runNpmCommand('install', missingDependencies))
+          .then(() => runNpmCommand('uninstall', extraDependencies))
+          .then(() => {
+            set(packageJSON.name, packageJSON);
+          })
+          .then(() => {
+            events.emit(Events.INSTALLED);
+          })
+          .catch(() => {
+            throw new Error('Failed to install dependencies.');
+          });
+      } else {
+        // Push instant installed event to message queue in order to make sure all message handlers are registered
+        setTimeout(() => {
           events.emit(Events.INSTALLED);
-        })
-        .catch(() => {
-          throw new Error('Failed to install dependencies.');
-        });
+        }, 0);
+      }
 
     } else {
       throw new Error('Failed to load stored package.json.');
