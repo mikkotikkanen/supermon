@@ -1,6 +1,6 @@
 import { EventEmitter } from 'events';
 import { watch, WatchEvents } from './Watch';
-import { runRestartable, RunEvents } from './run_tmp';
+import { runRestartable, RunEvents } from './run';
 import { install, InstallEvents } from './install';
 import kill from 'tree-kill';
 
