@@ -15,6 +15,10 @@ let installEvents: EventEmitter;
 let isStarted = false;
 let isInstalling = false;
 
+
+/**
+ * Setup main process
+ */
 export default (args: ILibProps) => {
 
   // Setup watcher
