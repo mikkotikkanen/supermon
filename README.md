@@ -8,3 +8,4 @@ internal volume and local npm install commands aren't reflected to internal volu
 TODO:
 - first run sync (npm install, npm prune)?
 - store package.json somewhere
+- set updatenotifier to use the same custom directory
