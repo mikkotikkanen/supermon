@@ -1,6 +1,6 @@
 import { EventEmitter } from "events"
 import { join } from "path";
-import { runOnce } from "../Run";
+import { runOnce } from "../run";
 import { Events } from "./Events";
 import DependencyDiff, { Diff } from "./dependencyDiff";
 import LoadPackageJSON from "./loadPackageJSON";
