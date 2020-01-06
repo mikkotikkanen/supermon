@@ -1,5 +1,5 @@
 import { readFileSync, existsSync } from "fs";
-import { IPackageJSON } from "./IPackageJSON";
+import { IPackageJSON } from "./types/IPackageJSON";
 
 export default (filename: string) => {
   if (!existsSync(filename)) {
