@@ -28,12 +28,12 @@ const dependencyMapDiff = (mapA: IDependencyMap, mapB: IDependencyMap, strict = 
     };
 
     if (strict) {
-      // Strict diff, compare value as well
+      // Strict diff, compare version as well
       if (mapA[name] !== mapB[name]) {
         result.push(diff);
       }
     } else {
-      // Non-strict diff, compare existence
+      // Non-strict diff, just compare existence
       if (!mapB[name]) {
         result.push(diff);
       }
