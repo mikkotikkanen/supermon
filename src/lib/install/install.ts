@@ -4,7 +4,7 @@ import { runOnce } from "../run";
 import { Events } from "./Events";
 import DependencyDiff, { Diff } from "./dependencyDiff";
 import LoadPackageJSON from "./loadPackageJSON";
-import { set, get } from "../store";
+import { set, get } from "./store";
 
 
 let events: EventEmitter;

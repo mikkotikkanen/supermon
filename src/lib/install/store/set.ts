@@ -1,4 +1,4 @@
-import { IPackageJSON } from '../install/types/IPackageJSON';
+import { IPackageJSON } from '../types/IPackageJSON';
 import getStore from './getStore';
 
 
