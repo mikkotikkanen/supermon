@@ -10,33 +10,6 @@ import { set, get } from "../store";
 let events: EventEmitter;
 const cwd = '.';
 const packageJSONPath = join(cwd, 'package.json');
-const storedPackageJSONPath = join(cwd, 'package-stored.json');
-
-
-/**
- * Run npm install with logging against diff array
- *
- * @param diff Diff to run the install against
- * @param extraParams Extra params for npm install
- */
-const runNpmCommand = (cmd: string, diff: Diff[], extraParams: string = '') => new Promise((resolve, reject) => {
-  if (diff.length) {
-    const installString = diff.map(module => `${module.name}@${module.version}`).join(' ');
-    runOnce(`npm ${cmd} ${installString} --no-audit ${extraParams}`)
-      .then(() => {
-        console.log('');
-      })
-      .then(() => {
-        resolve();
-      })
-      .catch((err) => {
-        reject(err);
-      });
-
-  } else {
-    resolve();
-  }
-});
 
 
 export const install = () => {
@@ -65,10 +38,11 @@ export const install = () => {
       extraDependencies = extraDependencies.concat(diffDependencies.removed, diffDevDependencies.removed);
 
       if (missingDependencies.length || extraDependencies.length) {
+        // Sync missing/extra dependencies
         new Promise(resolve => resolve())
-          .then(() => { console.log('Installing missing dependencies...'); })
-          .then(() => runNpmCommand('install', missingDependencies))
-          .then(() => runNpmCommand('uninstall', extraDependencies))
+          .then(() => { console.log('Syncing dependencies...'); })
+          .then(() => runOnce(`npm install ${missingDependencies.map(module => `${module.name}@${module.version}`).join(' ')} --no-audit`))
+          .then(() => runOnce(`npm uninstall ${extraDependencies.map(module => `${module.name}@${module.version}`).join(' ')}`))
           .then(() => {
             set(packageJSON.name, packageJSON);
           })
@@ -76,9 +50,10 @@ export const install = () => {
             events.emit(Events.INSTALLED);
           })
           .catch(() => {
-            throw new Error('Failed to install dependencies.');
+            throw new Error('Failed dependency sync.');
           });
       } else {
+        // No dependencies to sync, continue
         // Push instant installed event to message queue in order to make sure all message handlers are registered
         setTimeout(() => {
           events.emit(Events.INSTALLED);
@@ -86,7 +61,20 @@ export const install = () => {
       }
 
     } else {
-      throw new Error('Failed to load stored package.json.');
+      // First run, do full sync
+      new Promise(resolve => resolve())
+        .then(() => { console.log('Could not find previous dependencies, running full sync (install & prune)...'); })
+        .then(() => runOnce('npm install --no-audit'))
+        .then(() => runOnce('npm prune'))
+        .then(() => {
+          set(packageJSON.name, packageJSON);
+        })
+        .then(() => {
+          events.emit(Events.INSTALLED);
+        })
+        .catch(() => {
+          throw new Error('Failed first run dependency sync.');
+        });
     }
   });
 
