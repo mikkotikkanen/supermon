@@ -5,15 +5,15 @@ interface IDependencyMap {
   [dependencyName: string]: string;
 }
 
-export type Diff = {
-  name: string,
-  version: string,
+export interface Diff {
+  name: string;
+  version: string;
 }
 
-export type DiffObject = {
-  added: Diff[],
-  removed: Diff[],
-  changed: Diff[],
+export interface DiffObject {
+  added: Diff[];
+  removed: Diff[];
+  changed: Diff[];
 }
 
 
