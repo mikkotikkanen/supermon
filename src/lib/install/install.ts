@@ -25,57 +25,68 @@ export const install = () => {
     // Load stored package.json
     const storedPackageJSON = get(packageJSON.name);
 
-    // Compare dependencies
-    if (storedPackageJSON) {
+    // Setup dependency diff maps
+    let missingDependencies: Diff[] = [];
+    let extraDependencies: Diff[] = [];
+
+    new Promise(resolve => resolve())
       // Do diff between stored and current package.json
-      const diffDependencies = DependencyDiff(storedPackageJSON.dependencies, packageJSON.dependencies);
-      const diffDevDependencies = DependencyDiff(storedPackageJSON.devDependencies, packageJSON.devDependencies);
+      .then(() => {
+        if (storedPackageJSON) {
+          const diffDependencies = DependencyDiff(storedPackageJSON.dependencies, packageJSON.dependencies);
+          const diffDevDependencies = DependencyDiff(storedPackageJSON.devDependencies, packageJSON.devDependencies);
+          missingDependencies = missingDependencies.concat(diffDependencies.added, diffDependencies.changed, diffDevDependencies.added, diffDevDependencies.changed);
+          extraDependencies = extraDependencies.concat(diffDependencies.removed, diffDevDependencies.removed);
+        }
+      })
 
-      // Collect missing and extra dependencies
-      let missingDependencies: Diff[] = [];
-      missingDependencies = missingDependencies.concat(diffDependencies.added, diffDependencies.changed, diffDevDependencies.added, diffDevDependencies.changed);
-      let extraDependencies: Diff[] = [];
-      extraDependencies = extraDependencies.concat(diffDependencies.removed, diffDevDependencies.removed);
+      // Message
+      .then(() => {
+        if (missingDependencies.length || extraDependencies.length) {
+          console.log('Syncing dependencies...');
 
-      if (missingDependencies.length || extraDependencies.length) {
-        // Sync missing/extra dependencies
-        new Promise(resolve => resolve())
-          .then(() => { console.log('Syncing dependencies...'); })
-          .then(() => runOnce(`npm install ${missingDependencies.map(module => `${module.name}@${module.version}`).join(' ')} --no-audit`))
-          .then(() => runOnce(`npm uninstall ${extraDependencies.map(module => `${module.name}@${module.version}`).join(' ')}`))
-          .then(() => {
-            set(packageJSON.name, packageJSON);
-          })
-          .then(() => {
-            events.emit(Events.INSTALLED);
-          })
-          .catch(() => {
-            throw new Error('Failed dependency sync.');
-          });
-      } else {
-        // No dependencies to sync, continue
-        // Push instant installed event to message queue in order to make sure all message handlers are registered
+          if (!storedPackageJSON) {
+            console.log('Could not find previous dependencies, running full sync (install & prune)');
+          }
+        }
+      })
+
+      // Sync dependencies
+      .then(async () => {
+        if (storedPackageJSON && (missingDependencies.length || extraDependencies.length)) {
+          if (missingDependencies.length) {
+            await runOnce(`npm install ${missingDependencies.map(module => `${module.name}@${module.version}`).join(' ')} --no-audit`);
+          }
+          if (extraDependencies.length) {
+            await runOnce(`npm uninstall ${extraDependencies.map(module => `${module.name}@${module.version}`).join(' ')}`);
+          }
+        } else if (!storedPackageJSON) {
+          await runOnce('npm install --no-audit')
+          await runOnce('npm prune')
+        } else {
+          // If we have stored packageJson but no changes, we should just continue silently
+        }
+      })
+
+      // Store the current packageJson
+      .then(() => {
+        set(packageJSON.name, packageJSON);
+      })
+
+      // Send installed event
+      .then(() => {
+        // Push installed event to message queue in order to make sure all message handlers are registered
         setTimeout(() => {
           events.emit(Events.INSTALLED);
         }, 0);
-      }
+      })
 
-    } else {
-      // First run, do full sync
-      new Promise(resolve => resolve())
-        .then(() => { console.log('Could not find previous dependencies, running full sync (install & prune)...'); })
-        .then(() => runOnce('npm install --no-audit'))
-        .then(() => runOnce('npm prune'))
-        .then(() => {
-          set(packageJSON.name, packageJSON);
-        })
-        .then(() => {
-          events.emit(Events.INSTALLED);
-        })
-        .catch(() => {
-          throw new Error('Failed first run dependency sync.');
-        });
-    }
+      .catch((err) => {
+        // TODO: Add debug flag
+        console.log('Error:', err);
+
+        throw new Error('Failed dependency sync.');
+      });
   });
 
   return events;
