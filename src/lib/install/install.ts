@@ -40,32 +40,26 @@ export const install = () => {
         }
       })
 
-      // Message
-      .then(() => {
-        if (missingDependencies.length || extraDependencies.length) {
-          console.log('Syncing dependencies...');
-
-          if (!storedPackageJSON) {
-            console.log('Could not find previous dependencies, running full sync (install & prune)');
-          }
-        }
-      })
-
       // Sync dependencies
       .then(async () => {
-        if (storedPackageJSON && (missingDependencies.length || extraDependencies.length)) {
+        if (!storedPackageJSON) {
+          // No previously stored dependencies
+          console.log('Could not find previous dependencies, running full sync (install & prune)...');
+          await runOnce('npm install --no-audit')
+          await runOnce('npm prune')
+
+        } else if (storedPackageJSON && (missingDependencies.length || extraDependencies.length)) {
+          console.log('Syncing dependencies...');
+          // Previously stored dependencies with changes
           if (missingDependencies.length) {
             await runOnce(`npm install ${missingDependencies.map(module => `${module.name}@${module.version}`).join(' ')} --no-audit`);
           }
           if (extraDependencies.length) {
             await runOnce(`npm uninstall ${extraDependencies.map(module => `${module.name}@${module.version}`).join(' ')}`);
           }
-        } else if (!storedPackageJSON) {
-          await runOnce('npm install --no-audit')
-          await runOnce('npm prune')
-        } else {
-          // If we have stored packageJson but no changes, we should just continue silently
         }
+
+        // Previously stored dependencies but no changes, just continue silently
       })
 
       // Store the current packageJson
