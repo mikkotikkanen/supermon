@@ -75,9 +75,8 @@ export default (args: ILibProps) => {
  * Setup signal handling
  */
 const cleanup = () => {
-  // Make sure we trigger kill events to both main and child processes
+  // Kill child process which will trigger tree-kill on main process
   runEvents.emit(RunEvents.KILL);
-  runEvents.emit(RunEvents.CLOSED, 0);
 }
 
 // Set system signals
