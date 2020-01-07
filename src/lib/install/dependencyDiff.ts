@@ -10,6 +10,12 @@ export type Diff = {
   version: string,
 }
 
+export type DiffObject = {
+  added: Diff[],
+  removed: Diff[],
+  changed: Diff[],
+}
+
 
 /**
  * Get difference between two dependency maps
@@ -63,9 +69,11 @@ export default (mapA: IDependencyMap, mapB: IDependencyMap) => {
     return reducer;
   }, <Diff[]>[]);
 
-  return {
+  const diff: DiffObject = {
     added,
     removed,
     changed,
   }
+
+  return diff
 }
