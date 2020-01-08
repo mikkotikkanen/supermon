@@ -1,0 +1,14 @@
+version: "3"
+services:
+  app:
+    build:
+      context: "."
+      dockerfile: "Dockerfile"
+    volumes:
+      - "node_modules_data:/usr/src/app/node_modules" # Set node_modules data volume
+    environment:
+      - "NODE_ENV=development"
+    command: "npm run test-server"
+
+volumes:
+  node_modules_data:

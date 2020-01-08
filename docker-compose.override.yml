@@ -1,0 +1,10 @@
+# Docker-compose overrides for local development setup
+#
+# To enable, copy the file into docker-compose.override.yml
+version: "3"
+services:
+  app:
+    volumes:
+      - ".:/usr/src/app" # Add host volume for development purposes
+    ports:
+      - "3001:3001"
