@@ -35,7 +35,6 @@ export class Run {
       if (!this.pid) {
         throw new Error("Can't kill child process, no process is running.");
       } else {
-        // Make sure we wait until all processes are killed before sending CLOSED event
         kill(this.pid, 'SIGTERM');
       }
     });
