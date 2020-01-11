@@ -18,7 +18,6 @@ export class Run {
   private command: string;
   private props: IRunProps;
   private pid = 0;
-  private isBeingKilled = false;
   events = new EventEmitter();
 
   constructor(command: string, props?: IRunProps) {
@@ -37,17 +36,17 @@ export class Run {
         throw new Error("Can't kill child process, no process is running.");
       } else {
         // Make sure we wait until all processes are killed before sending CLOSED event
-        this.isBeingKilled = true;
-        kill(this.pid, 'SIGKILL', () => {
-          this.isBeingKilled = false;
-          this.events.emit(Events.CLOSED, 0);
-        });
+        kill(this.pid, 'SIGTERM');
       }
     });
 
     if (defaultedProps.autostart) {
       this.events.emit(Events.START);
     }
+  }
+
+  isRunning() {
+    return this.pid !== 0;
   }
 
   execute() {
@@ -62,9 +61,8 @@ export class Run {
 
     child.on('close', (code: Number) => {
       if (this.pid) {
-        if (!this.isBeingKilled) {
-          this.events.emit(Events.CLOSED, code);
-        }
+        this.pid = 0;
+        this.events.emit(Events.CLOSED, code);
       }
     });
 

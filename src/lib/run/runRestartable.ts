@@ -24,7 +24,7 @@ export const runRestartable = (command: string, props?: IRunProps) => {
       }
 
       events.emit(Events.START);
-    } else {
+    } else if (!run.isRunning()) {
       events.emit(Events.CLOSED, code)
     }
   });
@@ -39,7 +39,9 @@ export const runRestartable = (command: string, props?: IRunProps) => {
     run.events.emit(Events.KILL);
   });
 
-  events.on(Events.KILL, () => run.events.emit(Events.KILL));
+  events.on(Events.KILL, () => {
+    run.events.emit(Events.KILL);
+  });
 
   return events;
 };
