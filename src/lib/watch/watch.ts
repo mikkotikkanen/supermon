@@ -1,6 +1,7 @@
 import { watch as chokidar, FSWatcher } from "chokidar";
 import { EventEmitter } from "events";
 import { Events } from "./Events";
+import debounce from "../utils/debounce";
 
 
 
@@ -13,10 +14,11 @@ export const watch = () => {
   const watchExtensions = ['js', 'mjs', 'json'];
   watcher = chokidar(watchExtensions.map(ext => `**/*.${ext}`), {
     ignored: ['./node_modules', './dist', './docs'],
+    usePolling: true,
   });
-  watcher.on('change', () => {
+  watcher.on('change', debounce(() => {
     events.emit(Events.CHANGED);
-  });
+  }, 1000));
 
   return events;
 }
