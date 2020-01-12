@@ -58,7 +58,7 @@ export default (mapA: IDependencyMap, mapB: IDependencyMap) => {
 
   added = added.concat(dependencyMapDiff(mapB, mapA));
   removed = removed.concat(dependencyMapDiff(mapA, mapB));
-  changed = changed.concat(dependencyMapDiff(mapA, mapB, true));
+  changed = changed.concat(dependencyMapDiff(mapB, mapA, true));
 
   // Clean already existing diffs from strict diff
   const nonStrictList = added.concat(removed).map(diff => diff.name);
