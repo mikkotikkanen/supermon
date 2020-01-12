@@ -28,8 +28,12 @@ export default (args: ILibProps) => {
     usePolling: args.usepolling,
   });
   watchEvents.on(WatchEvents.CHANGED, () => {
+    if (args.debug) {
+      console.log('index, CHANGED');
+    }
     // Only start emitting watch events once the child process is running
-    if (isStarted && !isInstalling) {
+    // if (isStarted && !isInstalling) {
+    if (isStarted) {
       console.log('');
       console.log('Files changed, restarting...');
       console.log('');
@@ -42,10 +46,16 @@ export default (args: ILibProps) => {
   // Setup installer
   installEvents = install();
   installEvents.on(InstallEvents.INSTALL, () => {
-    isInstalling = true;
+    if (args.debug) {
+      console.log('index, INSTALL');
+    }
+    watchEvents.emit(WatchEvents.DISABLE);
   });
   installEvents.on(InstallEvents.INSTALLED, () => {
-    isInstalling = false;
+    if (args.debug) {
+      console.log('index, INSTALLED');
+    }
+    watchEvents.emit(WatchEvents.ENABLE);
 
     // Only trigger restart if child process has been started already
     if (isStarted) {
