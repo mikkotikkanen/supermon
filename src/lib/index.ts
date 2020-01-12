@@ -6,7 +6,9 @@ import kill from 'tree-kill';
 
 
 export interface ILibProps {
-  executable: string
+  executable: string,
+  debug?: boolean,
+  usepolling?: boolean,
 }
 
 let runEvents: EventEmitter;
@@ -22,7 +24,9 @@ let isInstalling = false;
 export default (args: ILibProps) => {
 
   // Setup watcher
-  watchEvents = watch();
+  watchEvents = watch({
+    usePolling: args.usepolling,
+  });
   watchEvents.on(WatchEvents.CHANGED, () => {
     // Only start emitting watch events once the child process is running
     if (isStarted && !isInstalling) {

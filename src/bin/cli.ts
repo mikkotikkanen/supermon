@@ -25,12 +25,14 @@ if (isDocker()) {
 yargs.demandCommand(1);
 
 yargs
-  .option('usePolling', {
-    describe: 'Use polling instead of filesystem events. (CPU and memory heavy)',
+  .option('usepolling', {
+    describe: 'Use polling instead of filesystem events. (CPU and memory tax)',
   });
 
 const argv = yargs.argv;
 lib({
   // executable: argv._[0],
   executable: process.argv.slice(2).join(' '),
+  usepolling: <boolean>argv.usepolling,
+  debug: <boolean>argv.debug,
 });
