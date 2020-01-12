@@ -31,5 +31,6 @@ yargs
 
 const argv = yargs.argv;
 lib({
-  executable: argv._[0],
+  // executable: argv._[0],
+  executable: process.argv.slice(2).join(' '),
 });
