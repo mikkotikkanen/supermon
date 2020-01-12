@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "bin": {
-    "dockagemon": "./bin/cli"
+    "nodewatcher": "./dist/bin/cli"
   },
   "engines": {
     "node": ">=8"
