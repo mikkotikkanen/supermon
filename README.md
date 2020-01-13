@@ -6,5 +6,5 @@ internal volume and local npm install commands aren't reflected to internal volu
 
 
 TODO:
-- unbounce change events
 - check if the current node_modules already has the requested module installed to avoid double installs on local use
+- test with node.js debugger
