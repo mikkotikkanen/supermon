@@ -36,7 +36,7 @@
     "dev": "tsc --watch",
     "run-test-server": "node ./dist/bin/cli.js ./tests/apps/test-server.js",
     "test": "npm-run-all test:*",
-    "test:eslint": "eslint .",
+    "test:eslint": "eslint --ext .js,.ts .",
     "build": "tsc",
     "prepublishOnly": "npm run build"
   }
