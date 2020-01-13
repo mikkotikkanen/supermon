@@ -22,7 +22,7 @@ if (isDocker()) {
 //   process.exit();
 // }
 
-yargs.demandCommand(1);
+// yargs.demandCommand(1);
 
 yargs
   .option('usepolling', {
