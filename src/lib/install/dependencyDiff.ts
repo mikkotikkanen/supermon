@@ -27,7 +27,7 @@ export interface DiffObject {
 const dependencyMapDiff = (mapA: DependencyMap, mapB: DependencyMap, strict = false): Diff[] => {
   const result: Diff[] = [];
 
-  Object.keys(mapA).map((name) => {
+  Object.keys(mapA).forEach((name) => {
     const diff = {
       name,
       version: mapA[name],
@@ -38,11 +38,9 @@ const dependencyMapDiff = (mapA: DependencyMap, mapB: DependencyMap, strict = fa
       if (mapA[name] !== mapB[name]) {
         result.push(diff);
       }
-    } else {
+    } else if (!mapB[name]) {
       // Non-strict diff, just compare existence
-      if (!mapB[name]) {
-        result.push(diff);
-      }
+      result.push(diff);
     }
   });
 

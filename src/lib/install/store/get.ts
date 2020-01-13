@@ -1,7 +1,8 @@
 import getStore from './getStore';
+import { PackageJSON } from '../types/PackageJSON';
 
 
-export const get = (packageJsonName: string) => {
+export default (packageJsonName: string): PackageJSON => {
   const config = getStore(packageJsonName);
 
   return config.get('packageJSON');

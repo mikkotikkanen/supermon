@@ -2,7 +2,7 @@ import { EventEmitter } from 'events';
 import kill from 'tree-kill';
 import { watch, WatchEvents } from './watch';
 import { runRestartable, Events as RunEvents } from './run';
-import { install, InstallEvents } from './install';
+import { install, Events as InstallEvents } from './install';
 
 
 export interface LibProps {

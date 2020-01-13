@@ -1,7 +1,7 @@
 import { EventEmitter } from 'events';
 import { join } from 'path';
 import { runOnce } from '../run';
-import { Events } from './Events';
+import Events from './Events';
 import DependencyDiff, { Diff } from './dependencyDiff';
 import LoadPackageJSON from './loadPackageJSON';
 import { set, get } from './store';
@@ -12,7 +12,7 @@ const cwd = '.';
 const packageJSONPath = join(cwd, 'package.json');
 
 
-export const install = () => {
+export default (): EventEmitter => {
   events = new EventEmitter();
 
   events.on(Events.INSTALL, () => {
@@ -33,10 +33,25 @@ export const install = () => {
       // Do diff between stored and current package.json
       .then(() => {
         if (storedPackageJSON) {
-          const diffDependencies = DependencyDiff(storedPackageJSON.dependencies, packageJSON.dependencies);
-          const diffDevDependencies = DependencyDiff(storedPackageJSON.devDependencies, packageJSON.devDependencies);
-          missingDependencies = missingDependencies.concat(diffDependencies.added, diffDependencies.changed, diffDevDependencies.added, diffDevDependencies.changed);
-          extraDependencies = extraDependencies.concat(diffDependencies.removed, diffDevDependencies.removed);
+          const diffDependencies = DependencyDiff(
+            storedPackageJSON.dependencies,
+            packageJSON.dependencies,
+          );
+          const diffDevDependencies = DependencyDiff(
+            storedPackageJSON.devDependencies,
+            packageJSON.devDependencies,
+          );
+          // Combine dependency diffs
+          missingDependencies = missingDependencies.concat(
+            diffDependencies.added,
+            diffDependencies.changed,
+            diffDevDependencies.added,
+            diffDevDependencies.changed,
+          );
+          extraDependencies = extraDependencies.concat(
+            diffDependencies.removed,
+            diffDevDependencies.removed,
+          );
         }
       })
 
@@ -68,7 +83,7 @@ export const install = () => {
 
       // Send installed event
       .then(() => {
-        // Push installed event to message queue in order to make sure all message handlers are registered
+        // Push installed event to message queue (make sure all message handlers are registered)
         setTimeout(() => {
           events.emit(Events.INSTALLED);
         }, 0);

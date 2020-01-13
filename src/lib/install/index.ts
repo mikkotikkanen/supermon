@@ -1,2 +1,4 @@
-export { Events as InstallEvents } from './Events';
-export { install } from './install';
+import Events from './Events';
+import install from './install';
+
+export { install, Events };
