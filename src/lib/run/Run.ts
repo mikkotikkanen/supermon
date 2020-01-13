@@ -1,7 +1,7 @@
 import { spawn } from 'child_process';
 import { EventEmitter } from 'events';
 import kill from 'tree-kill';
-import { Events } from './Events';
+import Events from './Events';
 
 
 export interface RunProps {

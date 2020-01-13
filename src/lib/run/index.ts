@@ -1,3 +1,5 @@
-export { Events as RunEvents } from './Events';
-export { runOnce } from './runOnce';
-export { runRestartable } from './runRestartable';
+import runRestartable from './runRestartable';
+import runOnce from './runOnce';
+import Events from './Events';
+
+export { runOnce, runRestartable, Events };

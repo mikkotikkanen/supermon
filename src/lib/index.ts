@@ -1,7 +1,7 @@
 import { EventEmitter } from 'events';
 import kill from 'tree-kill';
 import { watch, WatchEvents } from './watch';
-import { runRestartable, RunEvents } from './run';
+import { runRestartable, Events as RunEvents } from './run';
 import { install, InstallEvents } from './install';
 
 
@@ -67,7 +67,7 @@ export default (args: LibProps): void => {
 
 
   // Setup the requested command
-  runEvents = runRestartable(`node ${args.executable}`, { autostart: false });
+  runEvents = runRestartable(`node ${args.executable}`);
   runEvents.on(RunEvents.STARTED, () => {
     isStarted = true;
   });

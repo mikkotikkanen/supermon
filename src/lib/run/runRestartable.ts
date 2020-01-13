@@ -1,13 +1,13 @@
 import { EventEmitter } from 'events';
-import { Run, RunProps } from './Run';
-import { Events } from './Events';
+import { Run } from './Run';
+import Events from './Events';
 
 
 const events = new EventEmitter();
 let isRestarting = false;
 
 
-export const runRestartable = (command: string, props?: RunProps) => {
+export default (command: string): EventEmitter => {
   const run = new Run(command);
 
   run.events.on(Events.STARTED, () => {
@@ -19,10 +19,6 @@ export const runRestartable = (command: string, props?: RunProps) => {
 
   run.events.on(Events.CLOSED, (code) => {
     if (isRestarting) {
-      if (props) {
-        props.autostart = true;
-      }
-
       events.emit(Events.START);
     } else if (!run.isRunning()) {
       events.emit(Events.CLOSED, code);
