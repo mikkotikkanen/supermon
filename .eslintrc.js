@@ -17,6 +17,13 @@ module.exports = {
     'dist/',
     'node_modules/',
   ],
+  settings: {
+    'import/resolver': {
+      node: {
+        extensions: ['.js', '.jsx', '.ts', '.tsx'],
+      }
+    }
+  },
   overrides: [
     {
       files: [
