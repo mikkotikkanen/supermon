@@ -28,7 +28,7 @@
   "scripts": {
     "dev": "tsc --watch",
     "test-server": "node ./dist/bin/cli.js ./tests/apps/test-server.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "echo \"No tests specified\"",
     "build": "tsc",
     "prepublishOnly": "npm run build"
   }
