@@ -2,9 +2,9 @@ const http = require('http');
 
 const port = 3001;
 
-const requestHandler = (request, response) => {
-  console.log(`GET ${request.url}`);
-  response.end('Hello Node.js Server');
+const requestHandler = (req, res) => {
+  console.log(`GET ${req.url}`);
+  res.end('Hello Node.js Server');
 };
 
 const server = http.createServer(requestHandler);
