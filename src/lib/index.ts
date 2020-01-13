@@ -1,28 +1,27 @@
 import { EventEmitter } from 'events';
+import kill from 'tree-kill';
 import { watch, WatchEvents } from './watch';
 import { runRestartable, RunEvents } from './run';
 import { install, InstallEvents } from './install';
-import kill from 'tree-kill';
 
 
-export interface ILibProps {
-  executable: string,
-  debug?: boolean,
-  usepolling?: boolean,
+export interface LibProps {
+  executable: string;
+  debug?: boolean;
+  usepolling?: boolean;
 }
 
 let runEvents: EventEmitter;
 let watchEvents: EventEmitter;
 let installEvents: EventEmitter;
 let isStarted = false;
-let isInstalling = false;
+// const isInstalling = false;
 
 
 /**
  * Setup main process
  */
-export default (args: ILibProps) => {
-
+export default (args: LibProps): void => {
   // Setup watcher
   watchEvents = watch({
     usePolling: args.usepolling,
@@ -82,16 +81,16 @@ export default (args: ILibProps) => {
 
   // Start with install
   installEvents.emit(InstallEvents.INSTALL);
-}
+};
 
 
 /**
  * Setup signal handling
  */
-const cleanup = () => {
+const cleanup = (): void => {
   // Kill child process which will trigger tree-kill on main process
   runEvents.emit(RunEvents.KILL);
-}
+};
 
 // Set system signals
 const sysSignals: NodeJS.Signals[] = ['SIGINT', 'SIGUSR1', 'SIGUSR2', 'SIGTERM'];
