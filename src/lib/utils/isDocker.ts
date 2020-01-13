@@ -1,25 +1,25 @@
-const fs = require('fs');
+import { statSync, readFileSync } from 'fs';
 
 let isDocker = false;
 
-function hasDockerEnv() {
+function hasDockerEnv(): boolean {
   try {
-    fs.statSync('/.dockerenv');
+    statSync('/.dockerenv');
     return true;
   } catch (err) {
     return false;
   }
 }
 
-function hasDockerCGroup() {
+function hasDockerCGroup(): boolean {
   try {
-    return fs.readFileSync('/proc/self/cgroup', 'utf8').includes('docker');
+    return readFileSync('/proc/self/cgroup', 'utf8').includes('docker');
   } catch (err) {
     return false;
   }
 }
 
-export default () => {
+export default (): boolean => {
   if (isDocker === undefined) {
     isDocker = hasDockerEnv() || hasDockerCGroup();
   }

@@ -1,5 +1,7 @@
-export const enum Events {
+const enum Events {
   CHANGED = 'changed',
   ENABLE = 'enable',
   DISABLE = 'disable',
 }
+
+export default Events;

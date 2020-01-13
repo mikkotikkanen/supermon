@@ -1,6 +1,6 @@
 import { watch as chokidar, FSWatcher } from 'chokidar';
 import { EventEmitter } from 'events';
-import { Events } from './Events';
+import Events from './Events';
 import debounce from '../utils/debounce';
 
 
