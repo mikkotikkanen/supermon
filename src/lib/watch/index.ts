@@ -1,2 +1,2 @@
-export { Events as WatchEvents } from "./Events";
-export { watch } from "./watch";
+export { Events as WatchEvents } from './Events';
+export { watch } from './watch';

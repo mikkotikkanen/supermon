@@ -1,31 +1,31 @@
-import { watch as chokidar, FSWatcher } from "chokidar";
-import { EventEmitter } from "events";
-import { Events } from "./Events";
-import debounce from "../utils/debounce";
+import { watch as chokidar, FSWatcher } from 'chokidar';
+import { EventEmitter } from 'events';
+import { Events } from './Events';
+import debounce from '../utils/debounce';
 
 
 /**
  * Set watch properties and defaults
  */
-export interface IWatchProps {
-  usePolling?: boolean,
+export interface WatchProps {
+  usePolling?: boolean;
 }
-const watchPropsDefaults: IWatchProps = {
+const watchPropsDefaults: WatchProps = {
   usePolling: false,
-}
+};
 
 const events = new EventEmitter();
 let watcher: FSWatcher;
 let isEnabled = true;
 
 
-export const watch = (props: IWatchProps = watchPropsDefaults) => {
-  const defaultedProps = Object.assign({}, watchPropsDefaults, props);
+export const watch = (props: WatchProps = watchPropsDefaults): EventEmitter => {
+  const defaultedProps = { ...watchPropsDefaults, ...props };
 
   // Watch for file changes
   const watchExtensions = ['js', 'mjs', 'json'];
 
-  watcher = chokidar(watchExtensions.map(ext => `**/*.${ext}`), {
+  watcher = chokidar(watchExtensions.map((ext) => `**/*.${ext}`), {
     ignored: ['./node_modules', './dist', './docs'],
     usePolling: defaultedProps.usePolling,
   });
@@ -48,4 +48,4 @@ export const watch = (props: IWatchProps = watchPropsDefaults) => {
   events.on(Events.DISABLE, () => { isEnabled = false; });
 
   return events;
-}
+};
