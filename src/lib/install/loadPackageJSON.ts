@@ -1,7 +1,7 @@
 import { readFileSync, existsSync } from 'fs';
 import { PackageJSON } from './types/PackageJSON';
 
-export default (filename: string) => {
+export default (filename: string): PackageJSON | null => {
   if (!existsSync(filename)) {
     return null;
   }
