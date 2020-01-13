@@ -1,29 +1,22 @@
-import { readFileSync, existsSync } from "fs";
-import { IPackageJSON } from "./types/IPackageJSON";
+import { readFileSync, existsSync } from 'fs';
+import { PackageJSON } from './types/PackageJSON';
 
 export default (filename: string) => {
   if (!existsSync(filename)) {
     return null;
-
-  } else {
-    const file = readFileSync(filename, { encoding: 'utf8' });
-
-    let json: IPackageJSON;
-    try {
-      json = JSON.parse(file);
-    } catch (err) {
-      throw err;
-    }
-
-    // Create final packageJSON
-    const packageJSON: IPackageJSON = {
-      name: json.name,
-      version: json.version,
-      dependencies: json.dependencies,
-      devDependencies: json.devDependencies,
-      peerDependencies: json.peerDependencies,
-    }
-
-    return packageJSON;
   }
-}
+  const file = readFileSync(filename, { encoding: 'utf8' });
+
+  const json: PackageJSON = JSON.parse(file);
+
+  // Create final packageJSON
+  const packageJSON: PackageJSON = {
+    name: json.name,
+    version: json.version,
+    dependencies: json.dependencies,
+    devDependencies: json.devDependencies,
+    peerDependencies: json.peerDependencies,
+  };
+
+  return packageJSON;
+};

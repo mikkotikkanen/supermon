@@ -1,3 +1,3 @@
-export interface IDependencyMap {
+export interface DependencyMap {
   [dependencyName: string]: string;
 }

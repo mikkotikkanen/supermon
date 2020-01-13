@@ -1,7 +1,7 @@
 /**
  * Compare two package.json dependencies
  */
-interface IDependencyMap {
+interface DependencyMap {
   [dependencyName: string]: string;
 }
 
@@ -24,12 +24,12 @@ export interface DiffObject {
  * @param mapB Depencency map to compare from
  * @param strict Wheter to compare values as well
  */
-const dependencyMapDiff = (mapA: IDependencyMap, mapB: IDependencyMap, strict = false) => {
+const dependencyMapDiff = (mapA: DependencyMap, mapB: DependencyMap, strict = false): Diff[] => {
   const result: Diff[] = [];
 
   Object.keys(mapA).map((name) => {
     const diff = {
-      name: name,
+      name,
       version: mapA[name],
     };
 
@@ -50,8 +50,7 @@ const dependencyMapDiff = (mapA: IDependencyMap, mapB: IDependencyMap, strict = 
 };
 
 
-
-export default (mapA: IDependencyMap, mapB: IDependencyMap) => {
+export default (mapA: DependencyMap, mapB: DependencyMap) => {
   let added: Diff[] = [];
   let removed: Diff[] = [];
   let changed: Diff[] = [];
@@ -61,7 +60,7 @@ export default (mapA: IDependencyMap, mapB: IDependencyMap) => {
   changed = changed.concat(dependencyMapDiff(mapB, mapA, true));
 
   // Clean already existing diffs from strict diff
-  const nonStrictList = added.concat(removed).map(diff => diff.name);
+  const nonStrictList = added.concat(removed).map((diff) => diff.name);
   changed = changed.reduce((reducer, diff) => {
     if (!nonStrictList.includes(diff.name)) {
       reducer.push(diff);
@@ -73,7 +72,7 @@ export default (mapA: IDependencyMap, mapB: IDependencyMap) => {
     added,
     removed,
     changed,
-  }
+  };
 
-  return diff
-}
+  return diff;
+};

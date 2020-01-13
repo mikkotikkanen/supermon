@@ -1,10 +1,10 @@
-import { EventEmitter } from "events"
-import { join } from "path";
-import { runOnce } from "../run";
-import { Events } from "./Events";
-import DependencyDiff, { Diff } from "./dependencyDiff";
-import LoadPackageJSON from "./loadPackageJSON";
-import { set, get } from "./store";
+import { EventEmitter } from 'events';
+import { join } from 'path';
+import { runOnce } from '../run';
+import { Events } from './Events';
+import DependencyDiff, { Diff } from './dependencyDiff';
+import LoadPackageJSON from './loadPackageJSON';
+import { set, get } from './store';
 
 
 let events: EventEmitter;
@@ -29,7 +29,7 @@ export const install = () => {
     let missingDependencies: Diff[] = [];
     let extraDependencies: Diff[] = [];
 
-    new Promise(resolve => resolve())
+    new Promise((resolve) => resolve())
       // Do diff between stored and current package.json
       .then(() => {
         if (storedPackageJSON) {
@@ -45,17 +45,16 @@ export const install = () => {
         if (!storedPackageJSON) {
           // No previously stored dependencies
           console.log('Could not find previous dependencies, running full sync (install & prune)...');
-          await runOnce('npm install --no-audit')
-          await runOnce('npm prune')
-
+          await runOnce('npm install --no-audit');
+          await runOnce('npm prune');
         } else if (storedPackageJSON && (missingDependencies.length || extraDependencies.length)) {
           console.log('Syncing dependencies...');
           // Previously stored dependencies with changes
           if (missingDependencies.length) {
-            await runOnce(`npm install ${missingDependencies.map(module => `${module.name}@${module.version}`).join(' ')} --no-audit`);
+            await runOnce(`npm install ${missingDependencies.map((module) => `${module.name}@${module.version}`).join(' ')} --no-audit`);
           }
           if (extraDependencies.length) {
-            await runOnce(`npm uninstall ${extraDependencies.map(module => `${module.name}@${module.version}`).join(' ')}`);
+            await runOnce(`npm uninstall ${extraDependencies.map((module) => `${module.name}@${module.version}`).join(' ')}`);
           }
         }
 
@@ -84,4 +83,4 @@ export const install = () => {
   });
 
   return events;
-}
+};

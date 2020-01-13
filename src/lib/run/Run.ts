@@ -4,25 +4,27 @@ import kill from 'tree-kill';
 import { Events } from './Events';
 
 
-export interface IRunProps {
-  cwd?: string,
-  autostart: boolean,
+export interface RunProps {
+  cwd?: string;
+  autostart: boolean;
 }
-const runPropsDefaults: IRunProps = {
+const runPropsDefaults: RunProps = {
   cwd: '.',
   autostart: true,
-}
+};
 
 
 export class Run {
   private command: string;
-  private props: IRunProps;
+
+  private props: RunProps;
+
   private pid = 0;
+
   events = new EventEmitter();
 
-  constructor(command: string, props?: IRunProps) {
-
-    const defaultedProps = Object.assign({}, runPropsDefaults, props);
+  constructor(command: string, props?: RunProps) {
+    const defaultedProps = { ...runPropsDefaults, ...props };
 
     this.command = command;
     this.props = defaultedProps;
@@ -44,12 +46,11 @@ export class Run {
     }
   }
 
-  isRunning() {
+  isRunning(): boolean {
     return this.pid !== 0;
   }
 
-  execute() {
-
+  execute(): void {
     // Start child process
     const child = spawn(this.command, { // child event handlers are left behind after restart
       cwd: this.props.cwd,
@@ -58,7 +59,7 @@ export class Run {
     });
     this.pid = child.pid;
 
-    child.on('close', (code: Number) => {
+    child.on('close', (code: number) => {
       if (this.pid) {
         this.pid = 0;
         this.events.emit(Events.CLOSED, code);
@@ -68,7 +69,6 @@ export class Run {
     this.events.emit(Events.STARTED);
   }
 }
-
 
 
 // Make sure child is killed when process exits
