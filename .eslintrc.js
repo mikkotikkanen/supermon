@@ -17,4 +17,13 @@ module.exports = {
     'dist/',
     'node_modules/',
   ],
+  overrides: [
+    {
+      files: ['*.js', '*.jsx'],
+      rules: {
+        '@typescript-eslint/no-var-requires': 'off',
+        '@typescript-eslint/explicit-function-return-type': 'off',
+      }
+    }
+  ]
 };
