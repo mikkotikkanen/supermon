@@ -1,6 +1,6 @@
 # nodewatcher
 
-![alt](https://github.com/mikkotikkanen/nodewatcher/workflows/ci/badge.svg)
+![alt](https://github.com/mikkotikkanen/nodewatcher/workflows/CI/badge.svg)
 
 
 nodemon replacement for pure Node.js use cases with automated new module installation detection
