@@ -50,7 +50,7 @@ const dependencyMapDiff = (mapA: DependencyMap, mapB: DependencyMap, strict = fa
 };
 
 
-export default (mapA: DependencyMap, mapB: DependencyMap) => {
+export default (mapA: DependencyMap, mapB: DependencyMap): DiffObject => {
   let added: Diff[] = [];
   let removed: Diff[] = [];
   let changed: Diff[] = [];
@@ -66,7 +66,7 @@ export default (mapA: DependencyMap, mapB: DependencyMap) => {
       reducer.push(diff);
     }
     return reducer;
-  }, <Diff[]>[]);
+  }, [] as Diff[]);
 
   const diff: DiffObject = {
     added,
