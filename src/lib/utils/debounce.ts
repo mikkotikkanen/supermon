@@ -5,5 +5,5 @@ export default (func: Function, delay: number) => {
     const args = arguments;
     clearTimeout(inDebounce);
     inDebounce = setTimeout(() => func.apply(null, args), delay);
-  }
-}
+  };
+};

@@ -29,10 +29,10 @@ yargs
     describe: 'Use polling instead of filesystem events. (CPU and memory tax)',
   });
 
-const argv = yargs.argv;
+const { argv } = yargs;
 lib({
   // executable: argv._[0],
   executable: process.argv.slice(2).join(' '),
-  usepolling: <boolean>argv.usepolling,
-  debug: <boolean>argv.debug,
+  usepolling: argv.usepolling as boolean,
+  debug: argv.debug as boolean,
 });

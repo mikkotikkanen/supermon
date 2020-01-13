@@ -1,5 +1,5 @@
 import { EventEmitter } from 'events';
-import { Run, IRunProps } from "./Run";
+import { Run, RunProps } from './Run';
 import { Events } from './Events';
 
 
@@ -7,7 +7,7 @@ const events = new EventEmitter();
 let isRestarting = false;
 
 
-export const runRestartable = (command: string, props?: IRunProps) => {
+export const runRestartable = (command: string, props?: RunProps) => {
   const run = new Run(command);
 
   run.events.on(Events.STARTED, () => {
@@ -25,7 +25,7 @@ export const runRestartable = (command: string, props?: IRunProps) => {
 
       events.emit(Events.START);
     } else if (!run.isRunning()) {
-      events.emit(Events.CLOSED, code)
+      events.emit(Events.CLOSED, code);
     }
   });
 
