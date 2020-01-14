@@ -26,7 +26,7 @@ export const watch = (props: WatchProps = watchPropsDefaults): EventEmitter => {
   const watchExtensions = ['js', 'mjs', 'json'];
 
   watcher = chokidar(watchExtensions.map((ext) => `**/*.${ext}`), {
-    ignored: ['./node_modules', './dist', './docs'],
+    ignored: ['./node_modules', './docs'],
     usePolling: defaultedProps.usePolling,
   });
 
