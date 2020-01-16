@@ -9,7 +9,15 @@ export interface LibProps {
   executable: string;
   debug?: boolean;
   usepolling?: boolean;
+  watchDir?: string;
 }
+
+const libPropsDefaults = {
+  debug: false,
+  usepolling: true,
+  watchDir: '.',
+};
+
 
 let runEvents: EventEmitter;
 let watchEvents: EventEmitter;
@@ -21,17 +29,20 @@ let isStarted = false;
 /**
  * Setup main process
  */
-export default (args: LibProps): void => {
+export default (props: LibProps): void => {
+  const defaultedProps = { ...libPropsDefaults, ...props };
+
   // Setup watcher
   watchEvents = watch({
-    usePolling: args.usepolling,
+    cwd: props.watchDir,
+    usePolling: defaultedProps.usepolling,
   });
   watchEvents.on(WatchEvents.CHANGED, () => {
-    if (args.debug) {
+    if (defaultedProps.debug) {
       console.log('index, CHANGED');
     }
+
     // Only start emitting watch events once the child process is running
-    // if (isStarted && !isInstalling) {
     if (isStarted) {
       console.log('');
       console.log('Files changed, restarting...');
@@ -45,13 +56,13 @@ export default (args: LibProps): void => {
   // Setup installer
   installEvents = install();
   installEvents.on(InstallEvents.INSTALL, () => {
-    if (args.debug) {
+    if (defaultedProps.debug) {
       console.log('index, INSTALL');
     }
     watchEvents.emit(WatchEvents.DISABLE);
   });
   installEvents.on(InstallEvents.INSTALLED, () => {
-    if (args.debug) {
+    if (defaultedProps.debug) {
       console.log('index, INSTALLED');
     }
     watchEvents.emit(WatchEvents.ENABLE);
@@ -67,7 +78,7 @@ export default (args: LibProps): void => {
 
 
   // Setup the requested command
-  runEvents = runRestartable(`node ${args.executable}`);
+  runEvents = runRestartable(`node ${props.executable}`);
   runEvents.on(RunEvents.STARTED, () => {
     isStarted = true;
   });

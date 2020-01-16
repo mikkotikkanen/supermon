@@ -3,6 +3,7 @@ module.exports = {
   extends: [
     'airbnb-base',
     'plugin:@typescript-eslint/recommended',  // Uses the recommended rules from the @typescript-eslint/eslint-plugin
+    'plugin:jest/recommended',
   ],
   parserOptions: {
     ecmaVersion: 2018,  // Allows for the parsing of modern ECMAScript features
@@ -34,6 +35,7 @@ module.exports = {
       }
     }
   },
+  plugins: ['jest'],
   overrides: [
     {
       files: [

@@ -8,9 +8,11 @@ import debounce from '../utils/debounce';
  * Set watch properties and defaults
  */
 export interface WatchProps {
+  cwd?: string;
   usePolling?: boolean;
 }
 const watchPropsDefaults: WatchProps = {
+  cwd: '.',
   usePolling: false,
 };
 
@@ -26,6 +28,7 @@ export const watch = (props: WatchProps = watchPropsDefaults): EventEmitter => {
   const watchExtensions = ['js', 'mjs', 'json'];
 
   watcher = chokidar(watchExtensions.map((ext) => `**/*.${ext}`), {
+    cwd: defaultedProps.cwd,
     ignored: ['./node_modules', './docs'],
     usePolling: defaultedProps.usePolling,
   });
