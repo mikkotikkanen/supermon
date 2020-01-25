@@ -24,9 +24,6 @@ module.exports = {
       }
     ]
   },
-  ignorePatterns: [
-    'dist/',
-  ],
   settings: {
     'import/resolver': {
       node: {
@@ -47,5 +44,9 @@ module.exports = {
         '@typescript-eslint/explicit-function-return-type': 'off',
       }
     }
-  ]
+  ],
+  ignorePatterns: [
+    'dist/',
+    'tmp/',
+  ],
 };
