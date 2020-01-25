@@ -41,7 +41,7 @@
     "dev-test-server": "node ./dist/bin/cli.js ./dist/test/apps/test-server.js",
     "test": "npm-run-all test:*",
     "test:eslint": "eslint --ext .js,.ts .",
-    "test:jest": "jest .",
+    "jest": "jest .",
     "build": "tsc",
     "prepublishOnly": "npm run build"
   }
