@@ -14,11 +14,12 @@ export interface LibProps {
 
 const libPropsDefaults = {
   debug: false,
-  usepolling: true,
+  usepolling: false,
   watchDir: '.',
 };
 
 
+const libEvents = new EventEmitter();
 let runEvents: EventEmitter;
 let watchEvents: EventEmitter;
 let installEvents: EventEmitter;
@@ -29,7 +30,7 @@ let isStarted = false;
 /**
  * Setup main process
  */
-export default (props: LibProps): void => {
+export default (props: LibProps): EventEmitter => {
   const defaultedProps = { ...libPropsDefaults, ...props };
 
   // Setup watcher
@@ -80,27 +81,41 @@ export default (props: LibProps): void => {
   // Setup the requested command
   runEvents = runRestartable(`node ${props.executable}`);
   runEvents.on(RunEvents.STARTED, () => {
+    libEvents.emit('started'); // Temporary
     isStarted = true;
   });
   runEvents.on(RunEvents.CLOSED, (code) => {
+    isStarted = false;
     console.log('');
     console.log('Process exited.', code);
 
     // Make sure we clean up all dangling processes
-    kill(process.pid);
+    process.exit(0);
   });
 
   // Start with install
   installEvents.emit(InstallEvents.INSTALL);
+
+  libEvents.on('kill', () => { // Temporary
+    runEvents.emit(RunEvents.KILL);
+  });
+
+  return libEvents;
 };
 
 
 /**
  * Setup signal handling
  */
+let isCleanupInProgress = false;
 const cleanup = (): void => {
-  // Kill child process which will trigger tree-kill on main process
-  runEvents.emit(RunEvents.KILL);
+  // Only when we are already running, do the cleanup
+  if (isStarted && !isCleanupInProgress) {
+    isCleanupInProgress = true;
+
+    // Kill child process which will trigger tree-kill on main process
+    runEvents.emit(RunEvents.KILL);
+  }
 };
 
 // Set system signals
