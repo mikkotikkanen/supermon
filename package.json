@@ -1,10 +1,10 @@
 {
-  "name": "nodewatcher",
+  "name": "supermon",
   "version": "0.0.1",
   "description": "",
   "main": "./dist/lib/index.js",
   "bin": {
-    "nodewatcher": "./dist/bin/cli.js"
+    "supermon": "./dist/bin/cli.js"
   },
   "engines": {
     "node": ">=8"
