@@ -1,5 +1,7 @@
 import { EventEmitter } from 'events';
 import { join } from 'path';
+import { existsSync } from 'fs';
+import { satisfies } from 'semver';
 import { runOnce } from '../run';
 import Events from './Events';
 import DependencyDiff, { Diff } from './dependencyDiff';
@@ -10,6 +12,7 @@ import { set, get } from './store';
 let events: EventEmitter;
 const cwd = '.';
 const packageJSONPath = join(cwd, 'package.json');
+const nodeModulesPath = join(cwd, 'node_modules');
 
 
 export default (): EventEmitter => {
@@ -53,6 +56,29 @@ export default (): EventEmitter => {
             diffDevDependencies.removed,
           );
         }
+      })
+
+      // Filter out already handled modules
+      .then(() => {
+        missingDependencies = missingDependencies.filter((dependency) => {
+          if (existsSync(join(nodeModulesPath, dependency.name))) {
+            const modulePackageJson = LoadPackageJSON(join(nodeModulesPath, dependency.name, 'package.json'));
+
+            // If the installed module package.json version satisfies the requested, skip it
+            if (modulePackageJson && satisfies(modulePackageJson.version, dependency.version)) {
+              return false;
+            }
+          }
+          return true;
+        });
+
+        extraDependencies = extraDependencies.filter((dependency) => {
+          // Skip any modules that are already uninstalled
+          if (!existsSync(join(nodeModulesPath, dependency.name))) {
+            return false;
+          }
+          return true;
+        });
       })
 
       // Sync dependencies
