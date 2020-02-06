@@ -84,10 +84,10 @@ export default (props: LibProps): EventEmitter => {
     libEvents.emit('started'); // Temporary
     isStarted = true;
   });
-  runEvents.on(RunEvents.CLOSED, (code) => {
+  runEvents.on(RunEvents.CLOSED, () => {
     isStarted = false;
     console.log('');
-    console.log('Process exited.', code);
+    console.log('Process exited');
 
     // Make sure we clean up all dangling processes
     process.exit(0);
