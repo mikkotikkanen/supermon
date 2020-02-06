@@ -1,5 +1,7 @@
 # supermon
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/mikkotikkanen/supermon.svg)](https://greenkeeper.io/)
+
 ![alt](https://github.com/mikkotikkanen/supermon/workflows/CI/badge.svg)
 
 ## Note! Currently in development and testing, not ready for use yet
