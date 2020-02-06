@@ -24,8 +24,9 @@ export default class EventBus extends EventEmitter {
   readonly Events = EventBus.Events;
 
   // Override the default emit from EventEmitter
-  emit(event: Events): boolean {
-    return super.emit(event);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  emit(event: Events, ...args: any[]): boolean {
+    return super.emit(event, ...args);
   }
 }
 
