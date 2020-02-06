@@ -13,7 +13,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@types/semver": "^7.1.0",
     "chokidar": "^3.3.1",
     "configstore": "^5.0.0",
     "semver": "^7.1.2",
@@ -24,6 +23,7 @@
     "@types/configstore": "^4.0.0",
     "@types/jest": "^24.9.0",
     "@types/node": "^13.1.6",
+    "@types/semver": "^7.1.0",
     "@types/yargs": "^15.0.0",
     "@typescript-eslint/eslint-plugin": "^2.15.0",
     "@typescript-eslint/parser": "^2.15.0",
