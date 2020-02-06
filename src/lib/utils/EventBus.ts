@@ -23,13 +23,25 @@ export default class EventBus extends EventEmitter {
 
   readonly Events = EventBus.Events;
 
-  // Override the default emit from EventEmitter
+  /**
+   * Override the default emit from EventEmitter
+   *
+   * @param event Event enum
+   * @param args Arguments to pass to listeners
+   */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   emit(event: Events, ...args: any[]): boolean {
     return super.emit(event, ...args);
   }
+
+  /**
+   * Override default on handler from EventEmitter
+   *
+   * @param event Event enum
+   * @param listener Event listener
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  on(event: Events, listener: (...args: any[]) => void): this {
+    return super.on(event, listener);
+  }
 }
-
-
-const bus = new EventBus();
-bus.emit(bus.Events.ExecutableStart);
