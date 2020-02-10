@@ -2,10 +2,10 @@ import EventBus from '../utils/EventBus';
 
 
 export enum RunEvents {
-  ExecutableStart = 'ExecutableStart',
-  ExecutableStarted = 'ExecutableStarted',
-  ExecutableStop = 'ExecutableStop',
-  ExecutableStopped = 'ExecutableStopped',
+  Start = 'Start',
+  Started = 'Started',
+  Stop = 'Stop',
+  Stopped = 'Stopped',
 }
 
 export default class RunEventsBus extends EventBus {

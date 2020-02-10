@@ -2,9 +2,9 @@ import EventBus from '../utils/EventBus';
 
 
 export enum InstallEvents {
-  ModulesInstall = 'ModulesInstall',
-  ModulesInstalling = 'ModulesInstalling',
-  ModulesInstalled = 'ModulesInstalled',
+  Install = 'Install',
+  Installing = 'Installing',
+  Installed = 'Installed',
 }
 
 export default class InstallEventsBus extends EventBus {

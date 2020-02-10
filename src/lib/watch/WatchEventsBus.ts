@@ -2,8 +2,10 @@ import EventBus from '../utils/EventBus';
 
 
 export enum WatchEvents {
-  WatchStart = 'WatchStart',
-  WatchChangeEvent = 'WatchChangeEvent',
+  Start = 'Start',
+  FilesChanged = 'FilesChanged',
+  Enabled = 'Enabled',
+  Disabled = 'Disabled',
 }
 
 export default class WatchEventsBus extends EventBus {
