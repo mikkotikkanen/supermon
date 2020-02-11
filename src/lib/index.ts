@@ -2,6 +2,7 @@ import { EventEmitter } from 'events';
 import { install, InstallEventBus } from './install';
 import { watch, WatchEventBus } from './watch';
 import { runRestartable, RunEventBus } from './run';
+import logger from './logger';
 
 
 export interface LibProps {
@@ -22,6 +23,7 @@ const libEvents = new EventEmitter();
 let runEventBus: RunEventBus;
 let watchEventBus: WatchEventBus;
 let installEventBus: InstallEventBus;
+const logEventBus = logger();
 let isStarted = false;
 // const isInstalling = false;
 
@@ -44,13 +46,15 @@ export default (props: LibProps): EventEmitter => {
 
     // Only start emitting watch events once the child process is running
     if (isStarted) {
-      console.log('');
-      console.log('Files changed, restarting...');
-      console.log('');
+      // console.log('');
+      // console.log('Files changed, restarting...');
+      // console.log('');
+
 
       installEventBus.emit(installEventBus.Events.Install);
     }
   });
+  watchEventBus.pipe(logEventBus);
 
 
   // Setup installer
@@ -91,6 +95,7 @@ export default (props: LibProps): EventEmitter => {
     // Make sure we clean up all dangling processes
     process.exit(0);
   });
+  runEventBus.pipe(logEventBus);
 
   // Start with install
   installEventBus.emit(installEventBus.Events.Install);

@@ -9,6 +9,8 @@ export enum WatchEvents {
 }
 
 export default class WatchEventBus extends EventBus {
+  static readonly Events = WatchEvents;
+
   readonly Events = WatchEvents;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

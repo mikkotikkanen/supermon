@@ -9,6 +9,8 @@ export enum RunEvents {
 }
 
 export default class RunEventBus extends EventBus {
+  static readonly Events = RunEvents;
+
   readonly Events = RunEvents;
 
   private onKillFnc: Function = () => { /* init to empty function */ };
