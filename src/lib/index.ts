@@ -96,7 +96,7 @@ export default (props: LibProps): EventEmitter => {
   installEventBus.emit(installEventBus.Events.Install);
 
   libEvents.on('kill', () => { // Temporary
-    runEventBus.emit(runEventBus.Events.Stop);
+    runEventBus.kill();
   });
 
   return libEvents;
@@ -113,7 +113,7 @@ const cleanup = (): void => {
     isCleanupInProgress = true;
 
     // Kill child process which will trigger tree-kill on main process
-    runEventBus.emit(runEventBus.Events.Stop);
+    runEventBus.kill();
   }
 };
 

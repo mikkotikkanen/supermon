@@ -5,7 +5,6 @@ export enum RunEvents {
   Start = 'Start',
   Started = 'Started',
   Restart = 'Restart',
-  Stop = 'Stop',
   Stopped = 'Stopped',
 }
 

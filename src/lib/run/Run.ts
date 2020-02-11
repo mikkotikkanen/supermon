@@ -32,7 +32,7 @@ export class Run {
       // this.execute();
     });
 
-    this.eventBus.on(this.eventBus.Events.Stop, () => {
+    this.eventBus.onKill(() => {
       if (!this.pid) {
         throw new Error("Can't kill child process, no process is running.");
       } else {
@@ -44,6 +44,7 @@ export class Run {
       this.eventBus.emit(this.eventBus.Events.Start);
     }
   }
+
 
   isRunning(): boolean {
     return this.pid !== 0;

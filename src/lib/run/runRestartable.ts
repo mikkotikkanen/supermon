@@ -31,12 +31,11 @@ export default (command: string): RunEventBus => {
 
   runEventBus.on(runEventBus.Events.Restart, () => {
     isRestarting = true;
-    run.eventBus.emit(run.eventBus.Events.Stop);
+    run.eventBus.kill();
   });
 
-  runEventBus.on(runEventBus.Events.Stop, () => {
-    run.eventBus.emit(run.eventBus.Events.Stop);
-  });
+  // Pass kill request to execution eventbus
+  runEventBus.onKill(() => run.eventBus.kill());
 
   return runEventBus;
 };
