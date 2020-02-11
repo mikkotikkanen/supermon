@@ -1,9 +1,9 @@
 import { EventEmitter } from 'events';
-// import kill from 'tree-kill';
+import install from './install';
 import watch from './watch';
 import { runRestartable, Events as RunEvents } from './run';
-import { install, Events as InstallEvents } from './install';
 import WatchEventsBus from './watch/WatchEventsBus';
+import InstallEventsBus from './install/InstallEventsBus';
 
 
 export interface LibProps {
@@ -23,7 +23,7 @@ const libPropsDefaults = {
 const libEvents = new EventEmitter();
 let runEvents: EventEmitter;
 let watchEventBus: WatchEventsBus;
-let installEvents: EventEmitter;
+let installEventBus: InstallEventsBus;
 let isStarted = false;
 // const isInstalling = false;
 
@@ -50,20 +50,20 @@ export default (props: LibProps): EventEmitter => {
       console.log('Files changed, restarting...');
       console.log('');
 
-      installEvents.emit(InstallEvents.INSTALL);
+      installEventBus.emit(installEventBus.Events.Install);
     }
   });
 
 
   // Setup installer
-  installEvents = install();
-  installEvents.on(InstallEvents.INSTALL, () => {
+  installEventBus = install();
+  installEventBus.on(installEventBus.Events.Install, () => {
     if (defaultedProps.debug) {
       console.log('index, INSTALL');
     }
     watchEventBus.emit(watchEventBus.Events.Disable);
   });
-  installEvents.on(InstallEvents.INSTALLED, () => {
+  installEventBus.on(installEventBus.Events.Installed, () => {
     if (defaultedProps.debug) {
       console.log('index, INSTALLED');
     }
@@ -95,7 +95,7 @@ export default (props: LibProps): EventEmitter => {
   });
 
   // Start with install
-  installEvents.emit(InstallEvents.INSTALL);
+  installEventBus.emit(installEventBus.Events.Install);
 
   libEvents.on('kill', () => { // Temporary
     runEvents.emit(RunEvents.KILL);

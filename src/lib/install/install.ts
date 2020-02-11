@@ -1,24 +1,23 @@
-import { EventEmitter } from 'events';
 import { join } from 'path';
 import { existsSync } from 'fs';
 import { satisfies } from 'semver';
 import { runOnce } from '../run';
-import Events from './Events';
 import DependencyDiff, { Diff } from './dependencyDiff';
 import LoadPackageJSON from './loadPackageJSON';
 import { set, get } from './store';
+import InstallEventsBus from './InstallEventsBus';
 
 
-let events: EventEmitter;
+let installEventBus: InstallEventsBus;
 const cwd = '.';
 const packageJSONPath = join(cwd, 'package.json');
 const nodeModulesPath = join(cwd, 'node_modules');
 
 
-export default (): EventEmitter => {
-  events = new EventEmitter();
+export default (): InstallEventsBus => {
+  installEventBus = new InstallEventsBus();
 
-  events.on(Events.INSTALL, () => {
+  installEventBus.on(installEventBus.Events.Install, () => {
     // Load main package.json
     const packageJSON = LoadPackageJSON(packageJSONPath);
     if (!packageJSON) {
@@ -111,7 +110,7 @@ export default (): EventEmitter => {
       .then(() => {
         // Push installed event to message queue (make sure all message handlers are registered)
         setTimeout(() => {
-          events.emit(Events.INSTALLED);
+          installEventBus.emit(installEventBus.Events.Installed);
         }, 0);
       })
 
@@ -123,5 +122,5 @@ export default (): EventEmitter => {
       });
   });
 
-  return events;
+  return installEventBus;
 };

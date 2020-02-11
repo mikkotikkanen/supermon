@@ -1,4 +1,3 @@
-import Events from './Events';
 import install from './install';
 
-export { install, Events };
+export default install;
