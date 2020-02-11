@@ -8,7 +8,7 @@ export enum RunEvents {
   Stopped = 'Stopped',
 }
 
-export default class RunEventsBus extends EventBus {
+export default class RunEventBus extends EventBus {
   readonly Events = RunEvents;
 
   private onKillFnc: Function = () => { /* init to empty function */ };
