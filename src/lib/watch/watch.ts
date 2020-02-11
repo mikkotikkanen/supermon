@@ -20,7 +20,7 @@ let watcher: FSWatcher;
 let isEnabled = true;
 
 
-export const watch = (props: WatchProps = watchPropsDefaults): WatchEventBus => {
+export default (props: WatchProps = watchPropsDefaults): WatchEventBus => {
   const defaultedProps = { ...watchPropsDefaults, ...props };
 
   // Watch for file changes

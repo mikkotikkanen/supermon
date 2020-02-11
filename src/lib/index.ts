@@ -1,10 +1,7 @@
 import { EventEmitter } from 'events';
-import install from './install';
-import watch from './watch';
-import { runRestartable } from './run';
-import WatchEventBus from './watch/WatchEventBus';
-import InstallEventBus from './install/InstallEventBus';
-import RunEventBus from './run/RunEventBus';
+import { install, InstallEventBus } from './install';
+import { watch, WatchEventBus } from './watch';
+import { runRestartable, RunEventBus } from './run';
 
 
 export interface LibProps {

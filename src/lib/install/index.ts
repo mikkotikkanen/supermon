@@ -1,3 +1,4 @@
 import install from './install';
+import InstallEventBus from './InstallEventBus';
 
-export default install;
+export { install, InstallEventBus };
