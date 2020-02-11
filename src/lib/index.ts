@@ -1,8 +1,9 @@
 import { EventEmitter } from 'events';
 // import kill from 'tree-kill';
-import { watch, Events as WatchEvents } from './watch';
+import watch from './watch';
 import { runRestartable, Events as RunEvents } from './run';
 import { install, Events as InstallEvents } from './install';
+import WatchEventsBus from './watch/WatchEventsBus';
 
 
 export interface LibProps {
@@ -21,7 +22,7 @@ const libPropsDefaults = {
 
 const libEvents = new EventEmitter();
 let runEvents: EventEmitter;
-let watchEvents: EventEmitter;
+let watchEventBus: WatchEventsBus;
 let installEvents: EventEmitter;
 let isStarted = false;
 // const isInstalling = false;
@@ -34,11 +35,11 @@ export default (props: LibProps): EventEmitter => {
   const defaultedProps = { ...libPropsDefaults, ...props };
 
   // Setup watcher
-  watchEvents = watch({
+  watchEventBus = watch({
     cwd: props.watchDir,
     usePolling: defaultedProps.usepolling,
   });
-  watchEvents.on(WatchEvents.CHANGED, () => {
+  watchEventBus.on(watchEventBus.Events.FilesChanged, () => {
     if (defaultedProps.debug) {
       console.log('index, CHANGED');
     }
@@ -60,13 +61,13 @@ export default (props: LibProps): EventEmitter => {
     if (defaultedProps.debug) {
       console.log('index, INSTALL');
     }
-    watchEvents.emit(WatchEvents.DISABLE);
+    watchEventBus.emit(watchEventBus.Events.Disable);
   });
   installEvents.on(InstallEvents.INSTALLED, () => {
     if (defaultedProps.debug) {
       console.log('index, INSTALLED');
     }
-    watchEvents.emit(WatchEvents.ENABLE);
+    watchEventBus.emit(watchEventBus.Events.Enable);
 
     // Only trigger restart if child process has been started already
     if (isStarted) {

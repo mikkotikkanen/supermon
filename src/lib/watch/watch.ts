@@ -1,7 +1,6 @@
 import { watch as chokidar, FSWatcher } from 'chokidar';
-import { EventEmitter } from 'events';
-import Events from './Events';
 import debounce from '../utils/debounce';
+import WatchEventsBus from './WatchEventsBus';
 
 
 /**
@@ -16,12 +15,12 @@ const watchPropsDefaults: WatchProps = {
   usePolling: false,
 };
 
-const events = new EventEmitter();
+const eventBus = new WatchEventsBus();
 let watcher: FSWatcher;
 let isEnabled = true;
 
 
-export const watch = (props: WatchProps = watchPropsDefaults): EventEmitter => {
+export const watch = (props: WatchProps = watchPropsDefaults): WatchEventsBus => {
   const defaultedProps = { ...watchPropsDefaults, ...props };
 
   // Watch for file changes
@@ -35,7 +34,7 @@ export const watch = (props: WatchProps = watchPropsDefaults): EventEmitter => {
 
   // Debounced change event emitter (can't use anonymous function)
   const debouncedChangeEvent = debounce(() => {
-    events.emit(Events.CHANGED);
+    eventBus.emit(eventBus.Events.FilesChanged);
   }, 200);
 
   watcher.on('change', () => {
@@ -47,8 +46,8 @@ export const watch = (props: WatchProps = watchPropsDefaults): EventEmitter => {
 
 
   // Set events to enable/disable the watcher
-  events.on(Events.ENABLE, () => { isEnabled = true; });
-  events.on(Events.DISABLE, () => { isEnabled = false; });
+  eventBus.on(eventBus.Events.Enable, () => { isEnabled = true; });
+  eventBus.on(eventBus.Events.Disable, () => { isEnabled = false; });
 
-  return events;
+  return eventBus;
 };
