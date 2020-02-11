@@ -1,4 +1,4 @@
-import Events from './Events';
 import install from './install';
+import InstallEventBus from './InstallEventBus';
 
-export { install, Events };
+export { install, InstallEventBus };

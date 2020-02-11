@@ -1,8 +1,7 @@
 import { EventEmitter } from 'events';
-// import kill from 'tree-kill';
-import { watch, Events as WatchEvents } from './watch';
-import { runRestartable, Events as RunEvents } from './run';
-import { install, Events as InstallEvents } from './install';
+import { install, InstallEventBus } from './install';
+import { watch, WatchEventBus } from './watch';
+import { runRestartable, RunEventBus } from './run';
 
 
 export interface LibProps {
@@ -20,9 +19,9 @@ const libPropsDefaults = {
 
 
 const libEvents = new EventEmitter();
-let runEvents: EventEmitter;
-let watchEvents: EventEmitter;
-let installEvents: EventEmitter;
+let runEventBus: RunEventBus;
+let watchEventBus: WatchEventBus;
+let installEventBus: InstallEventBus;
 let isStarted = false;
 // const isInstalling = false;
 
@@ -34,11 +33,11 @@ export default (props: LibProps): EventEmitter => {
   const defaultedProps = { ...libPropsDefaults, ...props };
 
   // Setup watcher
-  watchEvents = watch({
+  watchEventBus = watch({
     cwd: props.watchDir,
     usePolling: defaultedProps.usepolling,
   });
-  watchEvents.on(WatchEvents.CHANGED, () => {
+  watchEventBus.on(watchEventBus.Events.FilesChanged, () => {
     if (defaultedProps.debug) {
       console.log('index, CHANGED');
     }
@@ -49,55 +48,55 @@ export default (props: LibProps): EventEmitter => {
       console.log('Files changed, restarting...');
       console.log('');
 
-      installEvents.emit(InstallEvents.INSTALL);
+      installEventBus.emit(installEventBus.Events.Install);
     }
   });
 
 
   // Setup installer
-  installEvents = install();
-  installEvents.on(InstallEvents.INSTALL, () => {
+  installEventBus = install();
+  installEventBus.on(installEventBus.Events.Install, () => {
     if (defaultedProps.debug) {
       console.log('index, INSTALL');
     }
-    watchEvents.emit(WatchEvents.DISABLE);
+    watchEventBus.emit(watchEventBus.Events.Disable);
   });
-  installEvents.on(InstallEvents.INSTALLED, () => {
+  installEventBus.on(installEventBus.Events.Installed, () => {
     if (defaultedProps.debug) {
       console.log('index, INSTALLED');
     }
-    watchEvents.emit(WatchEvents.ENABLE);
+    watchEventBus.emit(watchEventBus.Events.Enable);
 
     // Only trigger restart if child process has been started already
     if (isStarted) {
       isStarted = false;
-      runEvents.emit(RunEvents.RESTART);
+      runEventBus.emit(runEventBus.Events.Restart);
     } else {
-      runEvents.emit(RunEvents.START);
+      runEventBus.emit(runEventBus.Events.Start);
     }
   });
 
 
   // Setup the requested command
-  runEvents = runRestartable(`node ${props.executable}`);
-  runEvents.on(RunEvents.STARTED, () => {
+  runEventBus = runRestartable(`node ${props.executable}`);
+  runEventBus.on(runEventBus.Events.Started, () => {
     libEvents.emit('started'); // Temporary
     isStarted = true;
   });
-  runEvents.on(RunEvents.CLOSED, (code) => {
+  runEventBus.on(runEventBus.Events.Stopped, () => {
     isStarted = false;
     console.log('');
-    console.log('Process exited.', code);
+    console.log('Process exited');
 
     // Make sure we clean up all dangling processes
     process.exit(0);
   });
 
   // Start with install
-  installEvents.emit(InstallEvents.INSTALL);
+  installEventBus.emit(installEventBus.Events.Install);
 
   libEvents.on('kill', () => { // Temporary
-    runEvents.emit(RunEvents.KILL);
+    runEventBus.kill();
   });
 
   return libEvents;
@@ -114,7 +113,7 @@ const cleanup = (): void => {
     isCleanupInProgress = true;
 
     // Kill child process which will trigger tree-kill on main process
-    runEvents.emit(RunEvents.KILL);
+    runEventBus.kill();
   }
 };
 

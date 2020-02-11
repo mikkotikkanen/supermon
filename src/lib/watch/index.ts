@@ -1,4 +1,4 @@
-import Events from './Events';
-import { watch } from './watch';
+import watch from './watch';
+import WatchEventBus from './WatchEventBus';
 
-export { watch, Events };
+export { watch, WatchEventBus };
