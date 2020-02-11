@@ -8,7 +8,7 @@ export enum WatchEvents {
   Disable = 'Disable',
 }
 
-export default class WatchEventsBus extends EventBus {
+export default class WatchEventBus extends EventBus {
   readonly Events = WatchEvents;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

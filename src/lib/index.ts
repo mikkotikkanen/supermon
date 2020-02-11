@@ -2,7 +2,7 @@ import { EventEmitter } from 'events';
 import install from './install';
 import watch from './watch';
 import { runRestartable, Events as RunEvents } from './run';
-import WatchEventsBus from './watch/WatchEventsBus';
+import WatchEventBus from './watch/WatchEventBus';
 import InstallEventBus from './install/InstallEventBus';
 
 
@@ -22,7 +22,7 @@ const libPropsDefaults = {
 
 const libEvents = new EventEmitter();
 let runEvents: EventEmitter;
-let watchEventBus: WatchEventsBus;
+let watchEventBus: WatchEventBus;
 let installEventBus: InstallEventBus;
 let isStarted = false;
 // const isInstalling = false;

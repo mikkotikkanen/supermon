@@ -1,6 +1,6 @@
 import { watch as chokidar, FSWatcher } from 'chokidar';
 import debounce from '../utils/debounce';
-import WatchEventsBus from './WatchEventsBus';
+import WatchEventBus from './WatchEventBus';
 
 
 /**
@@ -15,12 +15,12 @@ const watchPropsDefaults: WatchProps = {
   usePolling: false,
 };
 
-const eventBus = new WatchEventsBus();
+const eventBus = new WatchEventBus();
 let watcher: FSWatcher;
 let isEnabled = true;
 
 
-export const watch = (props: WatchProps = watchPropsDefaults): WatchEventsBus => {
+export const watch = (props: WatchProps = watchPropsDefaults): WatchEventBus => {
   const defaultedProps = { ...watchPropsDefaults, ...props };
 
   // Watch for file changes
