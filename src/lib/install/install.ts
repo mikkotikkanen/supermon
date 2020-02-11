@@ -5,17 +5,17 @@ import { runOnce } from '../run';
 import DependencyDiff, { Diff } from './dependencyDiff';
 import LoadPackageJSON from './loadPackageJSON';
 import { set, get } from './store';
-import InstallEventsBus from './InstallEventsBus';
+import InstallEventBus from './InstallEventBus';
 
 
-let installEventBus: InstallEventsBus;
+let installEventBus: InstallEventBus;
 const cwd = '.';
 const packageJSONPath = join(cwd, 'package.json');
 const nodeModulesPath = join(cwd, 'node_modules');
 
 
-export default (): InstallEventsBus => {
-  installEventBus = new InstallEventsBus();
+export default (): InstallEventBus => {
+  installEventBus = new InstallEventBus();
 
   installEventBus.on(installEventBus.Events.Install, () => {
     // Load main package.json

@@ -7,7 +7,7 @@ export enum InstallEvents {
   Installed = 'Installed',
 }
 
-export default class InstallEventsBus extends EventBus {
+export default class InstallEventBus extends EventBus {
   readonly Events = InstallEvents;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
