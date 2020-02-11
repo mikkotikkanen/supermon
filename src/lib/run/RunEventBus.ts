@@ -4,6 +4,7 @@ import EventBus from '../utils/EventBus';
 export enum RunEvents {
   Start = 'Start',
   Started = 'Started',
+  Restart = 'Restart',
   Stop = 'Stop',
   Stopped = 'Stopped',
 }

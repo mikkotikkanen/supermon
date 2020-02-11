@@ -1,43 +1,42 @@
-import { EventEmitter } from 'events';
 import { Run } from './Run';
-import Events from './Events';
+import RunEventBus from './RunEventBus';
 
 
-const events = new EventEmitter();
+const runEventBus = new RunEventBus();
 let isRestarting = false;
 
 
-export default (command: string): EventEmitter => {
+export default (command: string): RunEventBus => {
   const run = new Run(command);
 
-  run.events.on(Events.STARTED, () => {
+  run.eventBus.on(run.eventBus.Events.Started, () => {
     if (isRestarting) {
       isRestarting = false;
     }
-    events.emit(Events.STARTED);
+    runEventBus.emit(runEventBus.Events.Started);
   });
 
-  run.events.on(Events.CLOSED, (code) => {
+  run.eventBus.on(run.eventBus.Events.Stopped, (code) => {
     if (isRestarting) {
-      events.emit(Events.START);
+      runEventBus.emit(runEventBus.Events.Start);
     } else if (!run.isRunning()) {
-      events.emit(Events.CLOSED, code);
+      runEventBus.emit(runEventBus.Events.Stopped, code);
     }
   });
 
   // Set main event emitter events
-  events.on(Events.START, () => {
+  runEventBus.on(runEventBus.Events.Start, () => {
     run.execute();
   });
 
-  events.on(Events.RESTART, () => {
+  runEventBus.on(runEventBus.Events.Restart, () => {
     isRestarting = true;
-    run.events.emit(Events.KILL);
+    run.eventBus.emit(run.eventBus.Events.Stop);
   });
 
-  events.on(Events.KILL, () => {
-    run.events.emit(Events.KILL);
+  runEventBus.on(runEventBus.Events.Stop, () => {
+    run.eventBus.emit(run.eventBus.Events.Stop);
   });
 
-  return events;
+  return runEventBus;
 };

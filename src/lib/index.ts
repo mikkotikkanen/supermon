@@ -1,9 +1,10 @@
 import { EventEmitter } from 'events';
 import install from './install';
 import watch from './watch';
-import { runRestartable, Events as RunEvents } from './run';
+import { runRestartable } from './run';
 import WatchEventBus from './watch/WatchEventBus';
 import InstallEventBus from './install/InstallEventBus';
+import RunEventBus from './run/RunEventBus';
 
 
 export interface LibProps {
@@ -21,7 +22,7 @@ const libPropsDefaults = {
 
 
 const libEvents = new EventEmitter();
-let runEvents: EventEmitter;
+let runEventBus: RunEventBus;
 let watchEventBus: WatchEventBus;
 let installEventBus: InstallEventBus;
 let isStarted = false;
@@ -72,20 +73,20 @@ export default (props: LibProps): EventEmitter => {
     // Only trigger restart if child process has been started already
     if (isStarted) {
       isStarted = false;
-      runEvents.emit(RunEvents.RESTART);
+      runEventBus.emit(runEventBus.Events.Restart);
     } else {
-      runEvents.emit(RunEvents.START);
+      runEventBus.emit(runEventBus.Events.Start);
     }
   });
 
 
   // Setup the requested command
-  runEvents = runRestartable(`node ${props.executable}`);
-  runEvents.on(RunEvents.STARTED, () => {
+  runEventBus = runRestartable(`node ${props.executable}`);
+  runEventBus.on(runEventBus.Events.Started, () => {
     libEvents.emit('started'); // Temporary
     isStarted = true;
   });
-  runEvents.on(RunEvents.CLOSED, () => {
+  runEventBus.on(runEventBus.Events.Stopped, () => {
     isStarted = false;
     console.log('');
     console.log('Process exited');
@@ -98,7 +99,7 @@ export default (props: LibProps): EventEmitter => {
   installEventBus.emit(installEventBus.Events.Install);
 
   libEvents.on('kill', () => { // Temporary
-    runEvents.emit(RunEvents.KILL);
+    runEventBus.emit(runEventBus.Events.Stop);
   });
 
   return libEvents;
@@ -115,7 +116,7 @@ const cleanup = (): void => {
     isCleanupInProgress = true;
 
     // Kill child process which will trigger tree-kill on main process
-    runEvents.emit(RunEvents.KILL);
+    runEventBus.emit(runEventBus.Events.Stop);
   }
 };
 

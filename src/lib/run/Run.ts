@@ -1,7 +1,6 @@
 import { spawn } from 'child_process';
-import { EventEmitter } from 'events';
 import kill from 'tree-kill';
-import Events from './Events';
+import RunEventBus from './RunEventBus';
 
 
 export interface RunProps {
@@ -21,7 +20,7 @@ export class Run {
 
   private pid = 0;
 
-  events = new EventEmitter();
+  eventBus = new RunEventBus();
 
   constructor(command: string, props?: RunProps) {
     const defaultedProps = { ...runPropsDefaults, ...props };
@@ -29,11 +28,11 @@ export class Run {
     this.command = command;
     this.props = defaultedProps;
 
-    this.events.on(Events.START, () => {
+    this.eventBus.on(this.eventBus.Events.Start, () => {
       // this.execute();
     });
 
-    this.events.on(Events.KILL, () => {
+    this.eventBus.on(this.eventBus.Events.Stop, () => {
       if (!this.pid) {
         throw new Error("Can't kill child process, no process is running.");
       } else {
@@ -42,7 +41,7 @@ export class Run {
     });
 
     if (defaultedProps.autostart) {
-      this.events.emit(Events.START);
+      this.eventBus.emit(this.eventBus.Events.Start);
     }
   }
 
@@ -62,11 +61,11 @@ export class Run {
     child.on('close', (code: number) => {
       if (this.pid) {
         this.pid = 0;
-        this.events.emit(Events.CLOSED, code);
+        this.eventBus.emit(this.eventBus.Events.Stopped, code);
       }
     });
 
-    this.events.emit(Events.STARTED);
+    this.eventBus.emit(this.eventBus.Events.Started);
   }
 }
 
