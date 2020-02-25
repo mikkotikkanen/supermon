@@ -1,9 +1,9 @@
 import { writeFileSync } from 'fs';
 import { join, resolve as pathResolve } from 'path';
-import { EventEmitter } from 'events';
 import { clean, getValue } from './apps/libs/incrementer';
 import getWorkDir from './lib/getWorkDir';
 import lib from '../lib';
+import LibEventBus from '../lib/LibEventBus';
 
 const workDir = getWorkDir();
 const appFile = join(workDir, '..', 'dist', 'test', 'apps', 'test-incrementer.js');
@@ -12,20 +12,20 @@ const touchFile = join(workDir, 'empty_touch_file.js');
 let isStarted = false;
 
 
-let events: EventEmitter;
+let eventBus: LibEventBus;
 
 beforeAll(() => {
   clean(incrementFile);
 });
 
 test('restart', (done) => {
-  events = lib({
+  eventBus = lib({
     executable: `${appFile} ${incrementFile}`,
     watchDir: pathResolve(__dirname, '../../tmp'),
     // debug: true,
   });
 
-  events.on('started', () => {
+  eventBus.on(eventBus.Events.Started, () => {
     console.log('started lib...');
     if (!isStarted) {
       isStarted = true;
@@ -49,5 +49,5 @@ test('restart', (done) => {
 }, 10 * 1000);
 
 afterAll(() => {
-  events.emit('kill');
+  eventBus.kill();
 });

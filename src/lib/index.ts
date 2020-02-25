@@ -1,8 +1,8 @@
-import { EventEmitter } from 'events';
 import { install, InstallEventBus } from './install';
 import { watch, WatchEventBus } from './watch';
 import { runRestartable, RunEventBus } from './run';
 import logger from './logger';
+import LibEventBus from './LibEventBus';
 
 
 export interface LibProps {
@@ -19,7 +19,7 @@ const libPropsDefaults = {
 };
 
 
-const libEvents = new EventEmitter();
+const libEventBus = new LibEventBus();
 let runEventBus: RunEventBus;
 let watchEventBus: WatchEventBus;
 let installEventBus: InstallEventBus;
@@ -31,7 +31,7 @@ let isStarted = false;
 /**
  * Setup main process
  */
-export default (props: LibProps): EventEmitter => {
+export default (props: LibProps): LibEventBus => {
   const defaultedProps = { ...libPropsDefaults, ...props };
 
   // Setup watcher
@@ -84,7 +84,7 @@ export default (props: LibProps): EventEmitter => {
   // Setup the requested command
   runEventBus = runRestartable(`node ${props.executable}`);
   runEventBus.on(runEventBus.Events.Started, () => {
-    libEvents.emit('started'); // Temporary
+    libEventBus.emit(libEventBus.Events.Started); // Temporary
     isStarted = true;
   });
   runEventBus.on(runEventBus.Events.Stopped, () => {
@@ -100,11 +100,12 @@ export default (props: LibProps): EventEmitter => {
   // Start with install
   installEventBus.emit(installEventBus.Events.Install);
 
-  libEvents.on('kill', () => { // Temporary
+  libEventBus.onKill(() => {
+    isStarted = false;
     runEventBus.kill();
   });
 
-  return libEvents;
+  return libEventBus;
 };
 
 
