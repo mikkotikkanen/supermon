@@ -23,6 +23,7 @@ test('restart', (done) => {
     executable: `${appFile} ${incrementFile}`,
     watchDir: pathResolve(__dirname, '../../tmp'),
     // debug: true,
+    logging: false,
   });
 
   eventBus.on(eventBus.Events.Started, () => {

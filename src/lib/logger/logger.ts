@@ -29,7 +29,11 @@ export default (): EventBus => {
       console.log('');
     }
   });
-
+  eventBus.on(RunEventBus.Events.Stopped, () => {
+    isStarted = false;
+    console.log('');
+    console.log('Process exited');
+  });
 
   return eventBus;
 };

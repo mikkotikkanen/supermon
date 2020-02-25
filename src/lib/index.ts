@@ -10,12 +10,14 @@ export interface LibProps {
   debug?: boolean;
   usepolling?: boolean;
   watchDir?: string;
+  logging?: boolean;
 }
 
 const libPropsDefaults = {
   debug: false,
   usepolling: false,
   watchDir: '.',
+  logging: true,
 };
 
 
@@ -54,7 +56,9 @@ export default (props: LibProps): LibEventBus => {
       installEventBus.emit(installEventBus.Events.Install);
     }
   });
-  watchEventBus.pipe(logEventBus);
+  if (defaultedProps.logging) {
+    watchEventBus.pipe(logEventBus);
+  }
 
 
   // Setup installer
@@ -89,13 +93,13 @@ export default (props: LibProps): LibEventBus => {
   });
   runEventBus.on(runEventBus.Events.Stopped, () => {
     isStarted = false;
-    console.log('');
-    console.log('Process exited');
 
     // Make sure we clean up all dangling processes
     process.exit(0);
   });
-  runEventBus.pipe(logEventBus);
+  if (defaultedProps.logging) {
+    runEventBus.pipe(logEventBus);
+  }
 
   // Start with install
   installEventBus.emit(installEventBus.Events.Install);
