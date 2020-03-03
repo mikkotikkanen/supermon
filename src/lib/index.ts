@@ -48,11 +48,6 @@ export default (props: LibProps): LibEventBus => {
 
     // Only start emitting watch events once the child process is running
     if (isStarted) {
-      // console.log('');
-      // console.log('Files changed, restarting...');
-      // console.log('');
-
-
       installEventBus.emit(installEventBus.Events.Install);
     }
   });
