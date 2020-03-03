@@ -27,20 +27,18 @@ test('restart', (done) => {
   });
 
   eventBus.on(eventBus.Events.Started, () => {
-    console.log('started lib...');
     if (!isStarted) {
       isStarted = true;
 
+      expect(getValue(incrementFile)).toEqual(0);
+
       // Even though process is running, wait a bit for it to initialize properly
       setTimeout(() => {
-        console.log('touching file...');
         writeFileSync(touchFile, process.hrtime.bigint(), { encoding: 'utf8' });
       }, 100);
     } else {
       // Even though process is running, wait a bit for it to initialize properly
       setTimeout(() => {
-        console.log('workfile value:', getValue(incrementFile));
-
         expect(getValue(incrementFile)).toEqual(1);
 
         setTimeout(done, 100);
