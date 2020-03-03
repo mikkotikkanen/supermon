@@ -15,7 +15,7 @@ export const clean = (filename: string): void => {
 
 export const getValue = (filename: string): number => {
   const filePath = resolve(workDir, filename);
-  let value = -1;
+  let value = 0;
   if (existsSync(filePath)) {
     value = parseInt(readFileSync(filePath, { encoding: 'utf8' }), 10);
   }

@@ -1,27 +1,24 @@
-import EventBus from '../utils/EventBus';
+import EventBus from './utils/EventBus';
 
 
-export enum RunEvents {
-  Start = 'Start',
+export enum LibEvents {
   Started = 'Started',
-  Restart = 'Restart',
-  Stopped = 'Stopped',
 }
 
-export default class RunEventBus extends EventBus {
-  static readonly Events = RunEvents;
+export default class LibEventBus extends EventBus {
+  static readonly Events = LibEvents;
 
-  readonly Events = RunEvents;
+  readonly Events = LibEvents;
 
   private onKillFnc: Function = () => { /* init to empty function */ };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  emit(event: RunEvents, ...args: any[]): boolean {
+  emit(event: LibEvents, ...args: any[]): boolean {
     return super.emit(event, ...args);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  on(event: RunEvents, listener: (...args: any[]) => void): this {
+  on(event: LibEvents, listener: (...args: any[]) => void): this {
     return super.on(event, listener);
   }
 

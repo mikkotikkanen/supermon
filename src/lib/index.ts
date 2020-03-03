@@ -1,7 +1,8 @@
-import { EventEmitter } from 'events';
 import { install, InstallEventBus } from './install';
 import { watch, WatchEventBus } from './watch';
 import { runRestartable, RunEventBus } from './run';
+import logger from './logger';
+import LibEventBus from './LibEventBus';
 
 
 export interface LibProps {
@@ -9,19 +10,22 @@ export interface LibProps {
   debug?: boolean;
   usepolling?: boolean;
   watchDir?: string;
+  logging?: boolean;
 }
 
 const libPropsDefaults = {
   debug: false,
   usepolling: false,
   watchDir: '.',
+  logging: true,
 };
 
 
-const libEvents = new EventEmitter();
+const libEventBus = new LibEventBus();
 let runEventBus: RunEventBus;
 let watchEventBus: WatchEventBus;
 let installEventBus: InstallEventBus;
+const logEventBus = logger();
 let isStarted = false;
 // const isInstalling = false;
 
@@ -29,7 +33,7 @@ let isStarted = false;
 /**
  * Setup main process
  */
-export default (props: LibProps): EventEmitter => {
+export default (props: LibProps): LibEventBus => {
   const defaultedProps = { ...libPropsDefaults, ...props };
 
   // Setup watcher
@@ -44,13 +48,12 @@ export default (props: LibProps): EventEmitter => {
 
     // Only start emitting watch events once the child process is running
     if (isStarted) {
-      console.log('');
-      console.log('Files changed, restarting...');
-      console.log('');
-
       installEventBus.emit(installEventBus.Events.Install);
     }
   });
+  if (defaultedProps.logging) {
+    watchEventBus.pipe(logEventBus);
+  }
 
 
   // Setup installer
@@ -80,26 +83,28 @@ export default (props: LibProps): EventEmitter => {
   // Setup the requested command
   runEventBus = runRestartable(`node ${props.executable}`);
   runEventBus.on(runEventBus.Events.Started, () => {
-    libEvents.emit('started'); // Temporary
+    libEventBus.emit(libEventBus.Events.Started); // Temporary
     isStarted = true;
   });
   runEventBus.on(runEventBus.Events.Stopped, () => {
     isStarted = false;
-    console.log('');
-    console.log('Process exited');
 
     // Make sure we clean up all dangling processes
     process.exit(0);
   });
+  if (defaultedProps.logging) {
+    runEventBus.pipe(logEventBus);
+  }
 
   // Start with install
   installEventBus.emit(installEventBus.Events.Install);
 
-  libEvents.on('kill', () => { // Temporary
+  libEventBus.onKill(() => {
+    isStarted = false;
     runEventBus.kill();
   });
 
-  return libEvents;
+  return libEventBus;
 };
 
 
