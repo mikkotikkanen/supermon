@@ -33,6 +33,6 @@ const { argv } = yargs;
 lib({
   // executable: argv._[0],
   executable: process.argv.slice(2).join(' '),
-  usepolling: argv.usepolling as boolean,
+  polling: argv.usepolling as boolean,
   debug: argv.debug as boolean,
 });

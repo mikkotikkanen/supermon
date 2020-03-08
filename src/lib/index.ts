@@ -7,17 +7,20 @@ import LibEventBus from './LibEventBus';
 
 export interface LibProps {
   executable: string;
-  debug?: boolean;
-  usepolling?: boolean;
-  watchDir?: string;
+  modulesync?: boolean;
+  watchdir?: string;
+  polling?: boolean;
   logging?: boolean;
+  debug?: boolean;
 }
 
-const libPropsDefaults = {
-  debug: false,
-  usepolling: false,
-  watchDir: '.',
+const libPropsDefaults: LibProps = {
+  executable: '',
+  modulesync: true,
+  watchdir: '.',
+  polling: false,
   logging: true,
+  debug: false,
 };
 
 
@@ -38,8 +41,8 @@ export default (props: LibProps): LibEventBus => {
 
   // Setup watcher
   watchEventBus = watch({
-    cwd: props.watchDir,
-    usePolling: defaultedProps.usepolling,
+    cwd: props.watchdir,
+    polling: defaultedProps.polling,
   });
   watchEventBus.on(watchEventBus.Events.FilesChanged, () => {
     if (defaultedProps.debug) {

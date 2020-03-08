@@ -61,6 +61,7 @@ export default (): InstallEventBus => {
       .then(() => {
         missingDependencies = missingDependencies.filter((dependency) => {
           if (existsSync(join(nodeModulesPath, dependency.name))) {
+            // Try to load the package.json for the module
             const modulePackageJson = LoadPackageJSON(join(nodeModulesPath, dependency.name, 'package.json'));
 
             // If the installed module package.json version satisfies the requested, skip it
