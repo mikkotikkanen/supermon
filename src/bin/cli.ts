@@ -1,16 +1,10 @@
 #!/usr/bin/env node
 
 import yargs from 'yargs';
+import { readFileSync } from 'fs';
+import { join } from 'path';
 import lib from '../lib/index';
-import isDocker from '../lib/utils/isDocker';
 
-
-// Detect if we are running inside docker container
-// TODO: Can this really detect all docker images or should it be just a flag?
-if (isDocker()) {
-  console.log('running inside docker container');
-  // also watch package.json
-}
 
 // if (argv._.length === 0) {
 //   console.log('One executable must be provided.');
@@ -25,14 +19,49 @@ if (isDocker()) {
 // yargs.demandCommand(1);
 
 yargs
-  .option('usepolling', {
-    describe: 'Use polling instead of filesystem events. (CPU and memory tax)',
+  .env('SUPERMON')
+  .option('watchdir', {
+    type: 'string',
+    describe: 'Which directory to watch for changes',
+  })
+  .option('polling', {
+    type: 'boolean',
+    describe: 'Use polling (CPU and memory tax)',
+  })
+  .version(false) // Set custom version option to avoid "[boolean]" flag in help
+  .option('version', {
+    describe: 'Show version number',
+  })
+  .help(false) // Set custom help option to avoid "[boolean]" flag in help
+  .option('help', {
+    describe: 'Show help',
   });
 
+// Show help and version manually
+if (yargs.argv.version) {
+  const packageJsonString = readFileSync(join(__dirname, '../../package.json'), { encoding: 'utf8' });
+  const packageJson = JSON.parse(packageJsonString);
+  console.log(packageJson.version);
+  process.exit(); /* eslint-disable-line no-process-exit */
+}
+if (yargs.argv.help) {
+  yargs.showHelp('log');
+  console.log('');
+  console.log('Note: [boolean] options do not require value to be specified');
+  console.log('');
+  console.log('Note: All options can also be configured through environment variables with');
+  console.log('      "SUPERMON_" prefix. (fe. "SUPERMON_POLLING=true")');
+  console.log('');
+  console.log('Example use: "supermon app.js"');
+  process.exit(); /* eslint-disable-line no-process-exit */
+}
+
+
 const { argv } = yargs;
+console.log(argv);
 lib({
-  // executable: argv._[0],
   executable: process.argv.slice(2).join(' '),
-  polling: argv.usepolling as boolean,
+  watchdir: argv.watchdir as string,
+  polling: argv.polling as boolean,
   debug: argv.debug as boolean,
 });
