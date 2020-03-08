@@ -7,3 +7,20 @@
 nodemon replacement for pure Node.js use cases with automated new module installation detection
 and automated installation upon restart, tailored for Docker usecases where node_modules is run as
 internal volume and local npm install commands aren't reflected to internal volume.
+
+## Options
+
+```help
+Options:
+  --watchdir  Which directory to watch for changes                      [string]
+  --polling   Use polling (CPU and memory tax)                         [boolean]
+  --version   Show version number
+  --help      Show help
+
+Note: [boolean] options do not require value to be specified
+
+Note: All options can also be configured through environment variables with
+      "SUPERMON_" prefix. (fe. "SUPERMON_POLLING=true")
+
+Example use: "supermon app.js"
+```
