@@ -32,7 +32,7 @@ export default (): EventBus => {
   eventBus.on(RunEventBus.Events.Stopped, () => {
     isStarted = false;
     console.log('');
-    console.log('supermon] Process exited.');
+    console.log('[supermon] Process exited.');
   });
 
   return eventBus;
