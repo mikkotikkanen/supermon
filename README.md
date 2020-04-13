@@ -8,6 +8,24 @@ nodemon replacement for pure Node.js use cases with automated new module install
 and automated installation upon restart, tailored for Docker usecases where node_modules is run as
 internal volume and local npm install commands aren't reflected to internal volume.
 
+## Install
+
+```bash
+npm install supermon --save-dev
+```
+
+## Usage
+
+```bash
+supermon <application file>
+```
+
+Example
+
+```bash
+supermon app.js
+```
+
 ## Options
 
 ```help
