@@ -19,6 +19,9 @@ import lib from '../lib/index';
 // yargs.demandCommand(1);
 
 yargs
+  .parserConfiguration({
+    'unknown-options-as-args': true, // Make sure to pass all unknown options to the executable
+  })
   .env('SUPERMON')
   .option('watchdir', {
     type: 'string',
@@ -47,7 +50,7 @@ if (yargs.argv.version) {
 if (yargs.argv.help) {
   yargs.showHelp('log');
   console.log('');
-  console.log('Note: If supermon arguments are provided, you need to separate them from the executable and any parameters it might have with "--"');
+  console.log('Note: If supermon arguments are provided, it is recommended to use "--" as separator between supermon and application');
   console.log('');
   console.log('Note: [boolean] options do not require value to be specified');
   console.log('');
@@ -55,12 +58,14 @@ if (yargs.argv.help) {
   console.log('      "SUPERMON_" prefix. (fe. "SUPERMON_POLLING=true")');
   console.log('');
   console.log('Example use: "supermon app.js"');
-  console.log('Example use: "supermon --watchdir=dist -- app.js"');
+  console.log('Example use: "supermon --watchdir=dist -- app.js --port=80"');
   process.exit(); /* eslint-disable-line no-process-exit */
 }
 
 
 const { argv } = yargs;
+console.log(argv);
+
 lib({
   // executable: process.argv.slice(2).join(' '),
   executable: argv._.join(' '),
