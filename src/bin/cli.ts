@@ -47,19 +47,23 @@ if (yargs.argv.version) {
 if (yargs.argv.help) {
   yargs.showHelp('log');
   console.log('');
+  console.log('Note: If supermon arguments are provided, you need to separate them from the executable and any parameters it might have with "--"');
+  console.log('');
   console.log('Note: [boolean] options do not require value to be specified');
   console.log('');
   console.log('Note: All options can also be configured through environment variables with');
   console.log('      "SUPERMON_" prefix. (fe. "SUPERMON_POLLING=true")');
   console.log('');
   console.log('Example use: "supermon app.js"');
+  console.log('Example use: "supermon --watchdir=dist -- app.js"');
   process.exit(); /* eslint-disable-line no-process-exit */
 }
 
 
 const { argv } = yargs;
 lib({
-  executable: process.argv.slice(2).join(' '),
+  // executable: process.argv.slice(2).join(' '),
+  executable: argv._.join(' '),
   watchdir: argv.watchdir as string,
   polling: argv.polling as boolean,
   debug: argv.debug as boolean,
