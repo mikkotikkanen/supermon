@@ -64,10 +64,7 @@ if (yargs.argv.help) {
 
 
 const { argv } = yargs;
-console.log(argv);
-
 lib({
-  // executable: process.argv.slice(2).join(' '),
   executable: argv._.join(' '),
   watchdir: argv.watchdir as string,
   polling: argv.polling as boolean,
