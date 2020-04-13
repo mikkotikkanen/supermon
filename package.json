@@ -1,8 +1,8 @@
 {
   "name": "supermon",
-  "version": "0.0.2",
+  "version": "0.1.1",
   "description": "",
-  "main": "./dist/lib/index.js",
+  "main": "dist/lib/index.js",
   "bin": {
     "supermon": "./dist/bin/cli.js"
   },
@@ -13,6 +13,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "chalk": "^4.0.0",
     "chokidar": "^3.3.1",
     "configstore": "^5.0.0",
     "semver": "^7.1.2",

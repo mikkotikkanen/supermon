@@ -8,11 +8,15 @@ import WatchEventBus from './WatchEventBus';
  */
 export interface WatchProps {
   cwd?: string;
-  usePolling?: boolean;
+  polling?: boolean;
+  extensions?: Array<string>;
+  ignore?: Array<string>;
 }
 const watchPropsDefaults: WatchProps = {
   cwd: '.',
-  usePolling: false,
+  polling: false,
+  extensions: ['js', 'mjs', 'json'],
+  ignore: ['./node_modules', './docs'],
 };
 
 const eventBus = new WatchEventBus();
@@ -24,12 +28,11 @@ export default (props: WatchProps = watchPropsDefaults): WatchEventBus => {
   const defaultedProps = { ...watchPropsDefaults, ...props };
 
   // Watch for file changes
-  const watchExtensions = ['js', 'mjs', 'json'];
-
-  watcher = chokidar(watchExtensions.map((ext) => `**/*.${ext}`), {
+  const watchPatterns = (defaultedProps.extensions || []).map((ext) => `**/*.${ext}`);
+  watcher = chokidar(watchPatterns, {
     cwd: defaultedProps.cwd,
-    ignored: ['./node_modules', './docs'],
-    usePolling: defaultedProps.usePolling,
+    ignored: (defaultedProps.ignore || []),
+    usePolling: defaultedProps.polling,
   });
 
   // Debounced change event emitter (can't use anonymous function)

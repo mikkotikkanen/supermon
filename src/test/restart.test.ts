@@ -21,7 +21,7 @@ beforeAll(() => {
 test('restart', (done) => {
   eventBus = lib({
     executable: `${appFile} ${incrementFile}`,
-    watchDir: pathResolve(__dirname, '../../tmp'),
+    watchdir: pathResolve(__dirname, '../../tmp'),
     // debug: true,
     logging: false,
   });
