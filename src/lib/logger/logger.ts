@@ -1,3 +1,4 @@
+import { grey } from 'chalk';
 import EventBus from '../utils/EventBus';
 import { WatchEventBus } from '../watch';
 import { RunEventBus } from '../run';
@@ -5,6 +6,7 @@ import { RunEventBus } from '../run';
 
 export default (): EventBus => {
   const eventBus = new EventBus();
+  const logPrefix = `[${grey('supermon')}] `;
   let isStarted = false;
 
 
@@ -25,14 +27,14 @@ export default (): EventBus => {
   eventBus.on(WatchEventBus.Events.FilesChanged, () => {
     if (isStarted) {
       console.log('');
-      console.log('[supermon] Files changed, restarting...');
+      console.log(`${logPrefix} File change detected. Restarting application.`);
       console.log('');
     }
   });
   eventBus.on(RunEventBus.Events.Stopped, () => {
     isStarted = false;
     console.log('');
-    console.log('[supermon] Process exited.');
+    console.log(`${logPrefix} Application exited.`);
   });
 
   return eventBus;

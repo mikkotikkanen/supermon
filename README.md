@@ -17,7 +17,7 @@ Options:
   --version   Show version number
   --help      Show help
 
-Note: If supermon arguments are provided, you need to separate them from the executable and any parameters it might have with "--"
+Note: If supermon arguments are provided, it is recommended to use "--" as separator between supermon and executable
 
 Note: [boolean] options do not require value to be specified
 
@@ -25,5 +25,5 @@ Note: All options can also be configured through environment variables with
       "SUPERMON_" prefix. (fe. "SUPERMON_POLLING=true")
 
 Example use: "supermon app.js"
-Example use: "supermon --watchdir=dist -- app.js"
+Example use: "supermon --watchdir=dist -- app.js --port=80"
 ```
