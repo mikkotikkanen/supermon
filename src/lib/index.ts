@@ -1,3 +1,4 @@
+import { extname } from 'path';
 import { install, InstallEventBus } from './install';
 import { watch, WatchEventBus } from './watch';
 import { runRestartable, RunEventBus } from './run';
@@ -38,11 +39,13 @@ let isStarted = false;
  */
 export default (props: LibProps): LibEventBus => {
   const defaultedProps = { ...libPropsDefaults, ...props };
+  const isTypeScript = extname(props.executable) === '.ts';
 
   // Setup watcher
   watchEventBus = watch({
     cwd: props.watchdir,
     polling: defaultedProps.polling,
+    extensions: (isTypeScript ? ['ts', 'json'] : ['js', 'mjs', 'json']),
   });
   watchEventBus.on(watchEventBus.Events.FilesChanged, () => {
     if (defaultedProps.debug) {
@@ -84,7 +87,7 @@ export default (props: LibProps): LibEventBus => {
 
 
   // Setup the requested command
-  runEventBus = runRestartable(`node ${props.executable}`);
+  runEventBus = runRestartable(`${(isTypeScript ? 'ts-node' : 'node')} ${props.executable}`);
   runEventBus.on(runEventBus.Events.Started, () => {
     libEventBus.emit(libEventBus.Events.Started); // Temporary
     isStarted = true;
