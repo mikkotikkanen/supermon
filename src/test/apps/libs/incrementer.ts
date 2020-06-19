@@ -30,5 +30,5 @@ export const incrementer = (filename: string): void => {
   const filePath = resolve(workDir, filename);
   const value = getValue(filename);
 
-  writeFileSync(filePath, value + 1, { encoding: 'utf8' });
+  writeFileSync(filePath, `${value + 1}`, { encoding: 'utf8' });
 };

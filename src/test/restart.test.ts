@@ -34,7 +34,7 @@ test('restart', (done) => {
 
       // Wait a bit to make sure watcher is initialized
       setTimeout(() => {
-        writeFileSync(touchFile, process.hrtime.bigint(), { encoding: 'utf8' });
+        writeFileSync(touchFile, `${process.hrtime.bigint()}`, { encoding: 'utf8' });
       }, 100);
     } else {
       // Wait a bit to make sure incrementer has written the file
