@@ -1,56 +1,71 @@
 import { watch as chokidar, FSWatcher } from 'chokidar';
-import debounce from '../utils/debounce';
 import WatchEventBus from './WatchEventBus';
 
 
-/**
- * Set watch properties and defaults
- */
-export interface WatchProps {
+export type WatchProps = {
+  /**
+   * Working directory (default: '.')
+   */
   cwd?: string;
+
+  /**
+   * Whether or not to use file polling instead of FS events (default: false)
+   */
   polling?: boolean;
+
+  /**
+   * Which file extensions to watch (default: ['js', 'mjs', 'json'])
+   */
   extensions?: Array<string>;
+
+  /**
+   * Which paths to ignore (default: ['./node_modules', './docs'])
+   */
   ignore?: Array<string>;
 }
-const watchPropsDefaults: WatchProps = {
-  cwd: '.',
-  polling: false,
-  extensions: ['js', 'mjs', 'json'],
-  ignore: ['./node_modules', './docs'],
-};
+
 
 const eventBus = new WatchEventBus();
 let watcher: FSWatcher;
 let isEnabled = true;
 
-
-export default (props: WatchProps = watchPropsDefaults): WatchEventBus => {
-  const defaultedProps = { ...watchPropsDefaults, ...props };
+const watch = ({
+  cwd = '.',
+  polling = false,
+  extensions = ['js', 'mjs', 'json'],
+  ignore = ['./node_modules', './docs'],
+}: WatchProps): WatchEventBus => {
+  // const defaultedProps = { ...watchPropsDefaults, ...props };
+  let debounceTimer: NodeJS.Timeout;
 
   // Watch for file changes
-  const watchPatterns = (defaultedProps.extensions || []).map((ext) => `**/*.${ext}`);
+  const watchPatterns = (extensions || []).map((ext) => `**/*.${ext}`);
   watcher = chokidar(watchPatterns, {
-    cwd: defaultedProps.cwd,
-    ignored: (defaultedProps.ignore || []),
-    usePolling: defaultedProps.polling,
+    cwd,
+    ignored: (ignore || []),
+    usePolling: polling,
   });
-
-  // Debounced change event emitter (can't use anonymous function)
-  const debouncedChangeEvent = debounce(() => {
-    eventBus.emit(eventBus.Events.FilesChanged);
-  }, 200);
 
   watcher.on('change', () => {
     // Don't send events to the event emitter if watcher is disabled
     if (isEnabled) {
-      debouncedChangeEvent();
+      // Debounce repeating events
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        eventBus.emit(eventBus.Events.FilesChanged);
+      }, 200);
     }
   });
 
 
   // Set events to enable/disable the watcher
   eventBus.on(eventBus.Events.Enable, () => { isEnabled = true; });
-  eventBus.on(eventBus.Events.Disable, () => { isEnabled = false; });
+  eventBus.on(eventBus.Events.Disable, () => {
+    clearTimeout(debounceTimer);
+    isEnabled = false;
+  });
 
   return eventBus;
 };
+
+export default watch;
