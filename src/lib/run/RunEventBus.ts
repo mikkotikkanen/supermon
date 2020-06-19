@@ -13,7 +13,7 @@ export default class RunEventBus extends EventBus {
 
   readonly Events = RunEvents;
 
-  private onKillFnc: Function = () => { /* init to empty function */ };
+  private onKillFnc = () => { /* init to empty function */ };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   emit(event: RunEvents, ...args: any[]): boolean {
@@ -30,7 +30,7 @@ export default class RunEventBus extends EventBus {
    *
    * @param fnc Callback function when kill is called
    */
-  onKill(fnc: Function): void {
+  onKill(fnc: () => void): void {
     this.onKillFnc = fnc;
   }
 

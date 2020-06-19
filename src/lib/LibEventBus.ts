@@ -10,7 +10,7 @@ export default class LibEventBus extends EventBus {
 
   readonly Events = LibEvents;
 
-  private onKillFnc: Function = () => { /* init to empty function */ };
+  private onKillFnc = () => { /* init to empty function */ };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   emit(event: LibEvents, ...args: any[]): boolean {
@@ -27,7 +27,7 @@ export default class LibEventBus extends EventBus {
    *
    * @param fnc Callback function when kill is called
    */
-  onKill(fnc: Function): void {
+  onKill(fnc: () => void): void {
     this.onKillFnc = fnc;
   }
 
