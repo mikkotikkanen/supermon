@@ -1,5 +1,8 @@
 import {
-  writeFileSync, readFileSync, unlinkSync, existsSync,
+  writeFileSync,
+  readFileSync,
+  unlinkSync,
+  existsSync,
 } from 'fs';
 import { resolve } from 'path';
 import getWorkDir from '../../lib/getWorkDir';
@@ -26,5 +29,6 @@ export const getValue = (filename: string): number => {
 export const incrementer = (filename: string): void => {
   const filePath = resolve(workDir, filename);
   const value = getValue(filename);
+
   writeFileSync(filePath, value + 1, { encoding: 'utf8' });
 };

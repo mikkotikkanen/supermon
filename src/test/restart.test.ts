@@ -32,16 +32,17 @@ test('restart', (done) => {
 
       expect(getValue(incrementFile)).toEqual(0);
 
-      // Even though process is running, wait a bit for it to initialize properly
+      // Wait a bit to make sure watcher is initialized
       setTimeout(() => {
         writeFileSync(touchFile, process.hrtime.bigint(), { encoding: 'utf8' });
       }, 100);
     } else {
-      // Even though process is running, wait a bit for it to initialize properly
+      // Wait a bit to make sure incrementer has written the file
       setTimeout(() => {
-        expect(getValue(incrementFile)).toEqual(1);
+        expect(getValue(incrementFile)).toEqual(2);
 
-        setTimeout(done, 100);
+        // setTimeout(done, 100);
+        done();
       }, 100);
     }
   });
