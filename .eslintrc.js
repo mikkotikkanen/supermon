@@ -27,6 +27,8 @@ module.exports = {
         maxEOF: 1,
       },
     ],
+    'no-shadow': 'off', // Turn off regular no-shadow since it causes false positives with enums
+    '@typescript-eslint/no-shadow': ['error'], // Turn on TS specific no-shadow
   },
   settings: {
     'import/resolver': {
