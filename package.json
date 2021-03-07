@@ -1,7 +1,11 @@
 {
   "name": "supermon",
   "version": "0.1.1",
-  "description": "",
+  "description": "Nodemon replacement with node_module sync on Docker use",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mikkotikkanen/supermon"
+  },
   "main": "dist/lib/index.js",
   "bin": {
     "supermon": "./dist/bin/cli.js"
@@ -10,7 +14,10 @@
     "node": ">=8"
   },
   "keywords": [],
-  "author": "",
+  "author": {
+    "name": "Mikko Tikkanen",
+    "email": "mikko.tikkanen@gmail.com"
+  },
   "license": "ISC",
   "dependencies": {
     "chalk": "^4.1.0",
