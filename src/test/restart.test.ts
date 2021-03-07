@@ -1,3 +1,5 @@
+/* eslint-disable jest/no-done-callback */
+/* eslint-disable jest/no-conditional-expect */
 import { writeFileSync } from 'fs';
 import { join, resolve as pathResolve } from 'path';
 import { clean, getValue } from './apps/libs/incrementer';

@@ -31,7 +31,7 @@ export default (): InstallEventBus => {
     let missingDependencies: Diff[] = [];
     let extraDependencies: Diff[] = [];
 
-    new Promise((resolve) => resolve())
+    new Promise<void>((resolve) => resolve())
       // Do diff between stored and current package.json
       .then(() => {
         if (storedPackageJSON) {
