@@ -12,6 +12,15 @@ export interface LibProps {
   polling?: boolean;
   logging?: boolean;
   debug?: boolean;
+
+  /**
+   * How long to sleep (in ms) when file change event is detected
+   *
+   * Used to avoid triggering events on every file modifications on fe. `npm install`
+   *
+   * Default: 200
+   */
+    delay?: number;
 }
 
 
@@ -30,6 +39,7 @@ let isStarted = false;
 export default ({
   executable,
   debug = false,
+  delay = 200,
   logging = true,
   polling = false,
   watchdir = '.',
@@ -41,6 +51,7 @@ export default ({
     cwd: watchdir,
     polling,
     extensions: (isTypeScript ? ['ts', 'json'] : ['js', 'mjs', 'json']),
+    delay,
   });
   watchEventBus.on(watchEventBus.Events.FilesChanged, () => {
     if (debug) {
