@@ -95,8 +95,9 @@ export default (props: LibProps): LibEventBus => {
   runEventBus.on(runEventBus.Events.Stopped, () => {
     isStarted = false;
 
-    // Make sure we clean up all dangling processes
-    process.exit(0);
+    if (code === 0) {
+      // Make sure we clean up all dangling processes when application finishes
+      process.exit(0);
   });
   if (defaultedProps.logging) {
     runEventBus.pipe(logEventBus);
