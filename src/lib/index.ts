@@ -93,7 +93,8 @@ export default ({
 
 
   // Setup the requested command
-  runEventBus = runRestartable(`${(isTypeScript ? 'ts-node' : 'node')} ${executable}`);
+  const engine = (isTypeScript ? 'ts-node' : 'node');
+  runEventBus = runRestartable(`${engine} ${executable}`);
   runEventBus.on(runEventBus.Events.Started, () => {
     libEventBus.emit(libEventBus.Events.Started); // Temporary
     isStarted = true;
