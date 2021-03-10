@@ -8,21 +8,11 @@ import LibEventBus from './LibEventBus';
 
 export interface LibProps {
   executable: string;
-  modulesync?: boolean;
   watchdir?: string;
   polling?: boolean;
   logging?: boolean;
   debug?: boolean;
 }
-
-const libPropsDefaults: LibProps = {
-  executable: '',
-  modulesync: true,
-  watchdir: '.',
-  polling: false,
-  logging: true,
-  debug: false,
-};
 
 
 const libEventBus = new LibEventBus();
@@ -37,18 +27,23 @@ let isStarted = false;
 /**
  * Setup main process
  */
-export default (props: LibProps): LibEventBus => {
-  const defaultedProps = { ...libPropsDefaults, ...props };
-  const isTypeScript = extname(props.executable) === '.ts';
+export default ({
+  executable,
+  debug = false,
+  logging = true,
+  polling = false,
+  watchdir = '.',
+}: LibProps): LibEventBus => {
+  const isTypeScript = extname(executable) === '.ts';
 
   // Setup watcher
   watchEventBus = watch({
-    cwd: props.watchdir,
-    polling: defaultedProps.polling,
+    cwd: watchdir,
+    polling,
     extensions: (isTypeScript ? ['ts', 'json'] : ['js', 'mjs', 'json']),
   });
   watchEventBus.on(watchEventBus.Events.FilesChanged, () => {
-    if (defaultedProps.debug) {
+    if (debug) {
       console.log('index, CHANGED');
     }
 
@@ -57,7 +52,7 @@ export default (props: LibProps): LibEventBus => {
       installEventBus.emit(installEventBus.Events.Install);
     }
   });
-  if (defaultedProps.logging) {
+  if (logging) {
     watchEventBus.pipe(logEventBus);
   }
 
@@ -65,13 +60,13 @@ export default (props: LibProps): LibEventBus => {
   // Setup installer
   installEventBus = install();
   installEventBus.on(installEventBus.Events.Install, () => {
-    if (defaultedProps.debug) {
+    if (debug) {
       console.log('index, INSTALL');
     }
     watchEventBus.emit(watchEventBus.Events.Disable);
   });
   installEventBus.on(installEventBus.Events.Installed, () => {
-    if (defaultedProps.debug) {
+    if (debug) {
       console.log('index, INSTALLED');
     }
     watchEventBus.emit(watchEventBus.Events.Enable);
@@ -87,19 +82,20 @@ export default (props: LibProps): LibEventBus => {
 
 
   // Setup the requested command
-  runEventBus = runRestartable(`${(isTypeScript ? 'ts-node' : 'node')} ${props.executable}`);
+  runEventBus = runRestartable(`${(isTypeScript ? 'ts-node' : 'node')} ${executable}`);
   runEventBus.on(runEventBus.Events.Started, () => {
     libEventBus.emit(libEventBus.Events.Started); // Temporary
     isStarted = true;
   });
-  runEventBus.on(runEventBus.Events.Stopped, () => {
+  runEventBus.on(runEventBus.Events.Stopped, (code) => {
     isStarted = false;
 
     if (code === 0) {
       // Make sure we clean up all dangling processes when application finishes
       process.exit(0);
+    }
   });
-  if (defaultedProps.logging) {
+  if (logging) {
     runEventBus.pipe(logEventBus);
   }
 
