@@ -58,7 +58,7 @@ export default ({
   watchEventBus = watch({
     cwd: watchdir,
     polling,
-    extensions: (isTypeScript ? ['ts', 'json'] : ['js', 'mjs', 'json']),
+    extensions: (isTypeScript ? ['ts', 'tsx', 'json'] : ['js', 'mjs', 'jsx', 'json']),
     delay,
   });
   watchEventBus.on(watchEventBus.Events.FilesChanged, () => {
