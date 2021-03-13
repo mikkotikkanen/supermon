@@ -32,7 +32,9 @@ test('Application should restart on file change', () => new Promise<void>((resol
     expect(true).toBeTruthy();
     resolve();
   });
-}));
+
+  // Wait for some time since the first execution does full install
+}), 30 * 1000);
 
 afterAll(() => {
   // Make sure the process is killed
