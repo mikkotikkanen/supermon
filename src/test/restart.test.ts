@@ -18,6 +18,7 @@ test('Application should restart on file change', () => new Promise<void>((resol
     watchdir: pathResolve(__dirname, '../../tmp'),
     delay: 10,
     logging: false,
+    firstRunSync: false,
     // debug: true,
   });
 
@@ -34,7 +35,7 @@ test('Application should restart on file change', () => new Promise<void>((resol
   });
 
   // Wait for some time since the first execution does full install
-}), 90 * 1000);
+}));
 
 afterAll(() => {
   // Make sure the process is killed
