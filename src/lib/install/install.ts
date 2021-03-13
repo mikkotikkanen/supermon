@@ -85,7 +85,7 @@ export default (): InstallEventBus => {
       .then(async () => {
         if (!storedPackageJSON) {
           // No previously stored dependencies
-          console.log('Could not find previous dependencies, running full sync (install & prune)...');
+          console.log('First execution. Running full sync (install & prune)...');
           await runOnce('npm install --no-audit');
           await runOnce('npm prune');
         } else if (storedPackageJSON && (missingDependencies.length || extraDependencies.length)) {
