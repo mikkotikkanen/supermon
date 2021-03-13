@@ -14,7 +14,7 @@ test('Application should restart on file change', () => new Promise<void>((resol
   const appFile = join(workDir, '..', 'dist', 'test', 'apps', 'test-wait.js');
 
   eventBus = lib({
-    executable: `${appFile} 1`,
+    executable: `${appFile} 5`,
     watchdir: pathResolve(__dirname, '../../tmp'),
     delay: 10,
     logging: false,
