@@ -7,6 +7,12 @@ import LoadPackageJSON from './loadPackageJSON';
 import { set, get } from './store';
 import InstallEventBus from './InstallEventBus';
 
+type installProps = {
+  /**
+   * Wheter or not do to the first run full sync
+   */
+  firstRunSync: boolean;
+}
 
 let installEventBus: InstallEventBus;
 const cwd = '.';
@@ -14,7 +20,9 @@ const packageJSONPath = join(cwd, 'package.json');
 const nodeModulesPath = join(cwd, 'node_modules');
 
 
-export default (): InstallEventBus => {
+const install = ({
+  firstRunSync = true,
+}: installProps): InstallEventBus => {
   installEventBus = new InstallEventBus();
 
   installEventBus.on(installEventBus.Events.Install, () => {
@@ -85,9 +93,11 @@ export default (): InstallEventBus => {
       .then(async () => {
         if (!storedPackageJSON) {
           // No previously stored dependencies
-          console.log('First execution. Running full sync (install & prune)...');
-          await runOnce('npm install --no-audit');
-          await runOnce('npm prune');
+          if (firstRunSync) {
+            console.log('First execution. Running full sync (install & prune)...');
+            await runOnce('npm install --no-audit');
+            await runOnce('npm prune');
+          }
         } else if (storedPackageJSON && (missingDependencies.length || extraDependencies.length)) {
           console.log('Syncing dependencies...');
           // Previously stored dependencies with changes
@@ -125,3 +135,5 @@ export default (): InstallEventBus => {
 
   return installEventBus;
 };
+
+export default install;

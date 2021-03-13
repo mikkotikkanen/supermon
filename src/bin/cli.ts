@@ -31,6 +31,10 @@ yargs
     type: 'boolean',
     describe: 'Use polling (CPU and memory tax)',
   })
+  .option('noFirstRunSync', {
+    type: 'boolean',
+    describe: "Don't do full sync on first run",
+  })
   .version(false) // Set custom version option to avoid "[boolean]" flag in help
   .option('version', {
     describe: 'Show version number',
@@ -67,6 +71,7 @@ const { argv } = yargs;
 lib({
   executable: argv._.join(' '),
   watchdir: argv.watchdir as string,
-  polling: argv.polling as boolean,
+  polling: !argv.noFirstRunSync as boolean,
+  firstRunSync: argv.firstRunSync as boolean,
   debug: argv.debug as boolean,
 });

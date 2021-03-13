@@ -21,7 +21,12 @@ export interface LibProps {
    *
    * Default: 200
    */
-    delay?: number;
+  delay?: number;
+
+  /**
+   * Wheter or not to do full sync on first run
+   */
+  firstRunSync?: boolean;
 }
 
 
@@ -44,6 +49,7 @@ export default ({
   delay = 200,
   logging = true,
   polling = false,
+  firstRunSync = true,
   watchdir = '.',
 }: LibProps): LibEventBus => {
   const isTypeScript = extname(executable) === '.ts';
@@ -71,7 +77,9 @@ export default ({
 
 
   // Setup installer
-  installEventBus = install();
+  installEventBus = install({
+    firstRunSync,
+  });
   installEventBus.on(installEventBus.Events.Install, () => {
     if (debug) {
       console.log('index, INSTALL');

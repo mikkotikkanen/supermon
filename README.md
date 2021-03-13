@@ -38,12 +38,13 @@ supermon app.ts
 
 ```help
 Options:
-  --watchdir  Which directory to watch for changes                      [string]
-  --polling   Use polling (CPU and memory tax)                         [boolean]
-  --version   Show version number
-  --help      Show help
+  --watchdir        Which directory to watch for changes                [string]
+  --polling         Use polling (CPU and memory tax)                   [boolean]
+  --noFirstRunSync  Don't do full sync on first run                    [boolean]
+  --version         Show version number
+  --help            Show help
 
-Note: If supermon arguments are provided, it is recommended to use "--" as separator between supermon and executable
+Note: If supermon arguments are provided, it is recommended to use "--" as separator between supermon and application
 
 Note: [boolean] options do not require value to be specified
 
