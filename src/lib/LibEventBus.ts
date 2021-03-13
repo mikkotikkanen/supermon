@@ -3,6 +3,8 @@ import EventBus from './utils/EventBus';
 
 export enum LibEvents {
   Started = 'Started',
+  Stopped = 'Stopped',
+  Restarted = 'Restarted',
 }
 
 export default class LibEventBus extends EventBus {
