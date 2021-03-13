@@ -19,6 +19,7 @@ test('Application should restart on file change', () => new Promise<void>((resol
     delay: 10,
     logging: false,
     firstRunSync: false,
+    polling: true,
     debug: true,
   });
 
