@@ -52,7 +52,8 @@
     "dev-test-server": "supermon ./dist/test/apps/test-server.js",
     "test": "npm-run-all test:*",
     "test:eslint": "eslint --ext .js,.ts .",
-    "jest": "jest .",
+    "test:tsc": "tsc --noEmit",
+    "test:jest": "jest .",
     "build": "tsc",
     "prepublishOnly": "npm run build",
     "release": "semantic-release"
