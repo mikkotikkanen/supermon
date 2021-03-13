@@ -2,7 +2,7 @@ import { join } from 'path';
 import { existsSync } from 'fs';
 import { satisfies } from 'semver';
 import { runOnce } from '../run';
-import DependencyDiff, { Diff } from './dependencyDiff';
+import dependencyDiff, { Diff } from './dependencyDiff';
 import LoadPackageJSON from './loadPackageJSON';
 import { set, get } from './store';
 import InstallEventBus from './InstallEventBus';
@@ -35,11 +35,11 @@ export default (): InstallEventBus => {
       // Do diff between stored and current package.json
       .then(() => {
         if (storedPackageJSON) {
-          const diffDependencies = DependencyDiff(
+          const diffDependencies = dependencyDiff(
             storedPackageJSON.dependencies,
             packageJSON.dependencies,
           );
-          const diffDevDependencies = DependencyDiff(
+          const diffDevDependencies = dependencyDiff(
             storedPackageJSON.devDependencies,
             packageJSON.devDependencies,
           );
