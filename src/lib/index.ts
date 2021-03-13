@@ -1,4 +1,5 @@
 import { extname } from 'path';
+import treeKill from 'tree-kill';
 import { install, InstallEventBus } from './install';
 import { watch, WatchEventBus } from './watch';
 import { runRestartable, RunEventBus } from './run';
@@ -30,6 +31,7 @@ let watchEventBus: WatchEventBus;
 let installEventBus: InstallEventBus;
 const logEventBus = logger();
 let isStarted = false;
+let isBeingKilled = false;
 // const isInstalling = false;
 
 
@@ -96,15 +98,27 @@ export default ({
   const engine = (isTypeScript ? 'ts-node' : 'node');
   runEventBus = runRestartable(`${engine} ${executable}`);
   runEventBus.on(runEventBus.Events.Started, () => {
+    if (debug) {
+      console.log('index, STARTED');
+    }
+
     libEventBus.emit(libEventBus.Events.Started); // Temporary
     isStarted = true;
   });
+  runEventBus.on(runEventBus.Events.Restarted, () => {
+    libEventBus.emit(libEventBus.Events.Restarted);
+  });
   runEventBus.on(runEventBus.Events.Stopped, (code) => {
+    if (debug) {
+      console.log(`index, STOPPED (code: ${code})`);
+    }
+
+    libEventBus.emit(libEventBus.Events.Stopped); // Temporary
     isStarted = false;
 
-    if (code === 0) {
-      // Make sure we clean up all dangling processes when application finishes
-      process.exit(0);
+    if (code === 0 || isBeingKilled) {
+      // If we exited succesfully or we are getting killed, stop event watcher
+      watchEventBus.emit(watchEventBus.Events.Stop);
     }
   });
   if (logging) {
@@ -115,6 +129,7 @@ export default ({
   installEventBus.emit(installEventBus.Events.Install);
 
   libEventBus.onKill(() => {
+    isBeingKilled = true;
     isStarted = false;
     runEventBus.kill();
   });
@@ -123,25 +138,7 @@ export default ({
 };
 
 
-/**
- * Setup signal handling
- */
-let isCleanupInProgress = false;
-const cleanup = (): void => {
-  // Only when we are already running, do the cleanup
-  if (isStarted && !isCleanupInProgress) {
-    isCleanupInProgress = true;
-
-    // Kill child process which will trigger tree-kill on main process
-    runEventBus.kill();
-  }
-};
-
-// Set system signals
-const sysSignals: NodeJS.Signals[] = ['SIGINT', 'SIGUSR1', 'SIGUSR2', 'SIGTERM'];
-sysSignals.forEach((eventType) => {
-  process.on(eventType, cleanup);
+// On process exit, make sure to kill the whole tree
+process.on('exit', () => {
+  treeKill(process.pid, 'SIGTERM');
 });
-
-// Set process exit event (not valid system signal so set it separately)
-process.on('exit', cleanup);
