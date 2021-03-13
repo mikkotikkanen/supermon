@@ -106,6 +106,10 @@ export default ({
     isStarted = true;
   });
   runEventBus.on(runEventBus.Events.Restarted, () => {
+    if (debug) {
+      console.log('index, RESTARTED');
+    }
+
     libEventBus.emit(libEventBus.Events.Restarted);
   });
   runEventBus.on(runEventBus.Events.Stopped, (code) => {
