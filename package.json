@@ -53,7 +53,7 @@
     "test": "npm-run-all test:*",
     "test:eslint": "eslint --ext .js,.ts .",
     "test:tsc": "tsc --noEmit",
-    "test:jest": "jest .",
+    "test:jest": "npm run build && jest .",
     "build": "tsc",
     "prepublishOnly": "npm run build",
     "release": "semantic-release"
