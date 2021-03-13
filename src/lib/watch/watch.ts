@@ -83,6 +83,11 @@ const watch = ({
     isEnabled = false;
   });
 
+  eventBus.on(eventBus.Events.Stop, () => {
+    watcher.close();
+    eventBus.emit(eventBus.Events.Stopped);
+  });
+
   return eventBus;
 };
 

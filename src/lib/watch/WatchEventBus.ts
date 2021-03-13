@@ -6,6 +6,8 @@ export enum WatchEvents {
   FilesChanged = 'FilesChanged',
   Enable = 'Enable',
   Disable = 'Disable',
+  Stop = 'Stop',
+  Stopped = 'Stopped',
 }
 
 export default class WatchEventBus extends EventBus {
