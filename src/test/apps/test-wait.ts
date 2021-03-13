@@ -17,4 +17,5 @@ setTimeout(() => {
   // Keep the app running for set time
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   temp += 1;
+  console.log(temp);
 }, waitInSeconds * 1000);
