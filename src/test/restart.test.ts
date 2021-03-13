@@ -19,7 +19,7 @@ test('Application should restart on file change', () => new Promise<void>((resol
     delay: 10,
     logging: false,
     firstRunSync: false,
-    // debug: true,
+    debug: true,
   });
 
   eventBus.on(eventBus.Events.Started, () => {
