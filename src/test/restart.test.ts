@@ -23,13 +23,16 @@ test('Application should restart on file change', () => new Promise<void>((resol
   });
 
   eventBus.on(eventBus.Events.Started, () => {
+    console.log('started...');
     // Wait a bit to make sure watcher is initialized
     setTimeout(() => {
+      console.log('touching...');
       writeFileSync(touchFile, `${process.hrtime.bigint()}`, { encoding: 'utf8' });
     }, 100);
   });
 
   eventBus.on(eventBus.Events.Restarted, () => {
+    console.log('restarting...');
     expect(true).toBeTruthy();
     resolve();
   });
