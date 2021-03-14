@@ -26,6 +26,8 @@ export interface LibProps {
 
   /**
    * Wheter or not to do full sync on first run
+   *
+   * Default: true
    */
   firstRunSync?: boolean;
 }
