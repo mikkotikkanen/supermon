@@ -1,5 +1,6 @@
 import { extname } from 'path';
 import treeKill from 'tree-kill';
+import { existsSync } from 'fs';
 import { install, InstallEventBus } from './install';
 import { watch, WatchEventBus } from './watch';
 import { runRestartable, RunEventBus } from './run';
@@ -53,6 +54,10 @@ export default ({
   watchdir = '.',
 }: LibProps): LibEventBus => {
   const isTypeScript = extname(executable) === '.ts';
+
+  if (!existsSync(watchdir)) {
+    throw new Error(`Path "${watchdir}" does not exist.`);
+  }
 
   // Setup watcher
   watchEventBus = watch({
