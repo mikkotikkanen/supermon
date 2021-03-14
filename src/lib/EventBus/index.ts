@@ -46,7 +46,7 @@ export default class EventBus extends EventEmitter {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   emit(event: string, ...args: any[]): boolean {
     if (this.debug) {
-      console.log(`Event "${event}" triggered.`);
+      console.log(`Event "${event}" emitted.`);
     }
 
     return super.emit(event, ...args);
