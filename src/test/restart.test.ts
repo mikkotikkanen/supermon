@@ -19,7 +19,7 @@ beforeAll(() => {
 });
 
 test('Application should restart on file change', () => new Promise<void>((resolve) => {
-  // For some reason test doesn't work with .ts file (executed by ts-node)
+  // The test doesn't work with .ts app file (executed by ts-node)
   appFile = join(workDir, '..', 'dist', 'test', 'apps', 'test-wait.js');
   touchFile = join(workDir, 'empty_touch_file.js');
 
