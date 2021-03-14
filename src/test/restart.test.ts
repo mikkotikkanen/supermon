@@ -20,15 +20,16 @@ test('Application should restart on file change', () => new Promise<void>((resol
     logging: false,
     firstRunSync: false,
     polling: true,
-    debug: true,
+    // debug: true,
   });
 
   eventBus.on(eventBus.Events.Started, () => {
     console.log('started...');
     // Wait a bit to make sure watcher is initialized
     setTimeout(() => {
-      console.log('touching...');
-      writeFileSync(touchFile, `${process.hrtime.bigint()}`, { encoding: 'utf8' });
+      console.log(`touching (${touchFile})...`);
+      // writeFileSync(touchFile, `${process.hrtime.bigint()}`, { encoding: 'utf8' });
+      writeFileSync(touchFile, `${Math.random() * 10000}`, { encoding: 'utf8' });
     }, 100);
   });
 
