@@ -44,8 +44,6 @@ test('Application should restart on file change', () => new Promise<void>((resol
     expect(true).toBeTruthy();
     resolve();
   });
-
-  // Wait for some time since the first execution does full install
 }));
 
 afterAll(() => {
