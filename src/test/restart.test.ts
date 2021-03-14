@@ -1,55 +1,52 @@
-/* eslint-disable jest/no-done-callback */
-/* eslint-disable jest/no-conditional-expect */
 import { writeFileSync } from 'fs';
-import { join, resolve as pathResolve } from 'path';
-import { clean, getValue } from './apps/libs/incrementer';
+import { join } from 'path';
 import getWorkDir from './lib/getWorkDir';
 import lib from '../lib';
 import LibEventBus from '../lib/LibEventBus';
 
-const workDir = getWorkDir();
-const appFile = join(workDir, '..', 'dist', 'test', 'apps', 'test-incrementer.js');
-const incrementFile = 'restart_incrementer';
-const touchFile = join(workDir, 'empty_touch_file.js');
-let isStarted = false;
-
-
+let workDir: string;
+let appFile: string;
+let touchFile: string;
 let eventBus: LibEventBus;
 
 beforeAll(() => {
-  clean(incrementFile);
+  workDir = getWorkDir();
+  appFile = join(workDir, '..', 'dist', 'test', 'apps', 'test-wait.js');
+  touchFile = join(workDir, 'empty_touch_file.js');
+
+  // Create the touchFile so that file watcher has something to watch
+  writeFileSync(touchFile, '0', { encoding: 'utf8' });
 });
 
-test('restart', (done) => {
+test('Application should restart on file change', () => new Promise<void>((resolve) => {
+  // The test doesn't work with .ts app file (executed by ts-node)
+  appFile = join(workDir, '..', 'dist', 'test', 'apps', 'test-wait.js');
+  touchFile = join(workDir, 'empty_touch_file.js');
+
   eventBus = lib({
-    executable: `${appFile} ${incrementFile}`,
-    watchdir: pathResolve(__dirname, '../../tmp'),
-    // debug: true,
+    executable: `${appFile} 1`,
+    watchdir: workDir,
+    delay: 10,
     logging: false,
+    firstRunSync: false,
+    polling: true,
+    // debug: true,
   });
 
   eventBus.on(eventBus.Events.Started, () => {
-    if (!isStarted) {
-      isStarted = true;
-
-      expect(getValue(incrementFile)).toEqual(0);
-
-      // Wait a bit to make sure watcher is initialized
-      setTimeout(() => {
-        writeFileSync(touchFile, `${process.hrtime.bigint()}`, { encoding: 'utf8' });
-      }, 100);
-    } else {
-      // Wait a bit to make sure incrementer has written the file
-      setTimeout(() => {
-        expect(getValue(incrementFile)).toEqual(2);
-
-        // setTimeout(done, 100);
-        done();
-      }, 100);
-    }
+    // Wait a bit to make sure watcher is initialized
+    setTimeout(() => {
+      writeFileSync(touchFile, `${process.hrtime.bigint()}`, { encoding: 'utf8' });
+    }, 100);
   });
-}, 10 * 1000);
+
+  eventBus.on(eventBus.Events.Restarted, () => {
+    expect(true).toBeTruthy();
+    resolve();
+  });
+}));
 
 afterAll(() => {
+  // Make sure the process is killed
   eventBus.kill();
 });

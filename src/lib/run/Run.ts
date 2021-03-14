@@ -69,18 +69,3 @@ export class Run {
     this.eventBus.emit(this.eventBus.Events.Started);
   }
 }
-
-
-// Make sure child is killed when process exits
-// TODO: Handle all the events, including exceptions
-// TODO: Test if this can be set within the Run function (does it set itself over and over again)
-// process.on('SIGINT', () => events.emit(Events.KILL));
-
-
-// const termSignals: NodeJS.Signals[] = ['SIGINT', 'SIGUSR1', 'SIGUSR2', 'SIGTERM'];
-// termSignals.forEach((eventType) => {
-//   process.on(eventType, () => {
-//     console.log('process exit no2, PID', child.pid);
-//     kill(child.pid)
-//   });
-// });

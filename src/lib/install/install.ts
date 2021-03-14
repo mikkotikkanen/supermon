@@ -2,11 +2,17 @@ import { join } from 'path';
 import { existsSync } from 'fs';
 import { satisfies } from 'semver';
 import { runOnce } from '../run';
-import DependencyDiff, { Diff } from './dependencyDiff';
+import dependencyDiff, { Diff } from './dependencyDiff';
 import LoadPackageJSON from './loadPackageJSON';
 import { set, get } from './store';
 import InstallEventBus from './InstallEventBus';
 
+type installProps = {
+  /**
+   * Wheter or not do to the first run full sync
+   */
+  firstRunSync: boolean;
+}
 
 let installEventBus: InstallEventBus;
 const cwd = '.';
@@ -14,7 +20,9 @@ const packageJSONPath = join(cwd, 'package.json');
 const nodeModulesPath = join(cwd, 'node_modules');
 
 
-export default (): InstallEventBus => {
+const install = ({
+  firstRunSync = true,
+}: installProps): InstallEventBus => {
   installEventBus = new InstallEventBus();
 
   installEventBus.on(installEventBus.Events.Install, () => {
@@ -35,11 +43,11 @@ export default (): InstallEventBus => {
       // Do diff between stored and current package.json
       .then(() => {
         if (storedPackageJSON) {
-          const diffDependencies = DependencyDiff(
+          const diffDependencies = dependencyDiff(
             storedPackageJSON.dependencies,
             packageJSON.dependencies,
           );
-          const diffDevDependencies = DependencyDiff(
+          const diffDevDependencies = dependencyDiff(
             storedPackageJSON.devDependencies,
             packageJSON.devDependencies,
           );
@@ -85,9 +93,11 @@ export default (): InstallEventBus => {
       .then(async () => {
         if (!storedPackageJSON) {
           // No previously stored dependencies
-          console.log('Could not find previous dependencies, running full sync (install & prune)...');
-          await runOnce('npm install --no-audit');
-          await runOnce('npm prune');
+          if (firstRunSync) {
+            console.log('First execution. Running full sync (install & prune)...');
+            await runOnce('npm install --no-audit');
+            await runOnce('npm prune');
+          }
         } else if (storedPackageJSON && (missingDependencies.length || extraDependencies.length)) {
           console.log('Syncing dependencies...');
           // Previously stored dependencies with changes
@@ -125,3 +135,5 @@ export default (): InstallEventBus => {
 
   return installEventBus;
 };
+
+export default install;

@@ -12,8 +12,10 @@ export default (command: string): RunEventBus => {
   run.eventBus.on(run.eventBus.Events.Started, () => {
     if (isRestarting) {
       isRestarting = false;
+      runEventBus.emit(runEventBus.Events.Restarted);
+    } else {
+      runEventBus.emit(runEventBus.Events.Started);
     }
-    runEventBus.emit(runEventBus.Events.Started);
   });
 
   run.eventBus.on(run.eventBus.Events.Stopped, (code) => {

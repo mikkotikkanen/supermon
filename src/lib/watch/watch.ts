@@ -4,24 +4,41 @@ import WatchEventBus from './WatchEventBus';
 
 export type WatchProps = {
   /**
-   * Working directory (default: '.')
+   * Working directory
+   *
+   * Default: '.'
    */
   cwd?: string;
 
   /**
-   * Whether or not to use file polling instead of FS events (default: false)
+   * Whether or not to use file polling instead of FS events
+   *
+   * Default: false
    */
   polling?: boolean;
 
   /**
-   * Which file extensions to watch (default: ['js', 'mjs', 'json'])
+   * Which file extensions to watch
+   *
+   * Default: ['js', 'mjs', 'json']
    */
   extensions?: Array<string>;
 
   /**
-   * Which paths to ignore (default: ['./node_modules', './docs'])
+   * Which paths to ignore
+   *
+   * Default: ['./node_modules', './docs']
    */
   ignore?: Array<string>;
+
+  /**
+   * How long to sleep (in ms) when file change event is detected
+   *
+   * Used to avoid triggering events on every file modifications on fe. `npm install`
+   *
+   * Default: 200
+   */
+  delay?: number;
 }
 
 
@@ -34,6 +51,7 @@ const watch = ({
   polling = false,
   extensions = ['js', 'mjs', 'json'],
   ignore = ['./node_modules', './docs'],
+  delay = 200,
 }: WatchProps): WatchEventBus => {
   // const defaultedProps = { ...watchPropsDefaults, ...props };
   let debounceTimer: NodeJS.Timeout;
@@ -53,7 +71,7 @@ const watch = ({
       clearTimeout(debounceTimer);
       debounceTimer = setTimeout(() => {
         eventBus.emit(eventBus.Events.FilesChanged);
-      }, 200);
+      }, delay);
     }
   });
 
@@ -63,6 +81,11 @@ const watch = ({
   eventBus.on(eventBus.Events.Disable, () => {
     clearTimeout(debounceTimer);
     isEnabled = false;
+  });
+
+  eventBus.on(eventBus.Events.Stop, () => {
+    watcher.close();
+    eventBus.emit(eventBus.Events.Stopped);
   });
 
   return eventBus;

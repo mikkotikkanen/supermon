@@ -1,4 +1,6 @@
 import { extname } from 'path';
+import treeKill from 'tree-kill';
+import { existsSync } from 'fs';
 import { install, InstallEventBus } from './install';
 import { watch, WatchEventBus } from './watch';
 import { runRestartable, RunEventBus } from './run';
@@ -8,21 +10,25 @@ import LibEventBus from './LibEventBus';
 
 export interface LibProps {
   executable: string;
-  modulesync?: boolean;
   watchdir?: string;
   polling?: boolean;
   logging?: boolean;
   debug?: boolean;
-}
 
-const libPropsDefaults: LibProps = {
-  executable: '',
-  modulesync: true,
-  watchdir: '.',
-  polling: false,
-  logging: true,
-  debug: false,
-};
+  /**
+   * How long to sleep (in ms) when file change event is detected
+   *
+   * Used to avoid triggering events on every file modifications on fe. `npm install`
+   *
+   * Default: 200
+   */
+  delay?: number;
+
+  /**
+   * Wheter or not to do full sync on first run
+   */
+  firstRunSync?: boolean;
+}
 
 
 const libEventBus = new LibEventBus();
@@ -31,24 +37,37 @@ let watchEventBus: WatchEventBus;
 let installEventBus: InstallEventBus;
 const logEventBus = logger();
 let isStarted = false;
+let isBeingKilled = false;
 // const isInstalling = false;
 
 
 /**
  * Setup main process
  */
-export default (props: LibProps): LibEventBus => {
-  const defaultedProps = { ...libPropsDefaults, ...props };
-  const isTypeScript = extname(props.executable) === '.ts';
+export default ({
+  executable,
+  debug = false,
+  delay = 200,
+  logging = true,
+  polling = false,
+  firstRunSync = true,
+  watchdir = '.',
+}: LibProps): LibEventBus => {
+  const isTypeScript = extname(executable) === '.ts';
+
+  if (!existsSync(watchdir)) {
+    throw new Error(`Path "${watchdir}" does not exist.`);
+  }
 
   // Setup watcher
   watchEventBus = watch({
-    cwd: props.watchdir,
-    polling: defaultedProps.polling,
-    extensions: (isTypeScript ? ['ts', 'json'] : ['js', 'mjs', 'json']),
+    cwd: watchdir,
+    polling,
+    extensions: (isTypeScript ? ['ts', 'tsx', 'json'] : ['js', 'mjs', 'jsx', 'json']),
+    delay,
   });
   watchEventBus.on(watchEventBus.Events.FilesChanged, () => {
-    if (defaultedProps.debug) {
+    if (debug) {
       console.log('index, CHANGED');
     }
 
@@ -57,21 +76,23 @@ export default (props: LibProps): LibEventBus => {
       installEventBus.emit(installEventBus.Events.Install);
     }
   });
-  if (defaultedProps.logging) {
+  if (logging) {
     watchEventBus.pipe(logEventBus);
   }
 
 
   // Setup installer
-  installEventBus = install();
+  installEventBus = install({
+    firstRunSync,
+  });
   installEventBus.on(installEventBus.Events.Install, () => {
-    if (defaultedProps.debug) {
+    if (debug) {
       console.log('index, INSTALL');
     }
     watchEventBus.emit(watchEventBus.Events.Disable);
   });
   installEventBus.on(installEventBus.Events.Installed, () => {
-    if (defaultedProps.debug) {
+    if (debug) {
       console.log('index, INSTALLED');
     }
     watchEventBus.emit(watchEventBus.Events.Enable);
@@ -87,18 +108,37 @@ export default (props: LibProps): LibEventBus => {
 
 
   // Setup the requested command
-  runEventBus = runRestartable(`${(isTypeScript ? 'ts-node' : 'node')} ${props.executable}`);
+  const engine = (isTypeScript ? 'ts-node' : 'node');
+  runEventBus = runRestartable(`${engine} ${executable}`);
   runEventBus.on(runEventBus.Events.Started, () => {
+    if (debug) {
+      console.log('index, STARTED');
+    }
+
     libEventBus.emit(libEventBus.Events.Started); // Temporary
     isStarted = true;
   });
-  runEventBus.on(runEventBus.Events.Stopped, () => {
+  runEventBus.on(runEventBus.Events.Restarted, () => {
+    if (debug) {
+      console.log('index, RESTARTED');
+    }
+
+    libEventBus.emit(libEventBus.Events.Restarted);
+  });
+  runEventBus.on(runEventBus.Events.Stopped, (code) => {
+    if (debug) {
+      console.log(`index, STOPPED (code: ${code})`);
+    }
+
+    libEventBus.emit(libEventBus.Events.Stopped); // Temporary
     isStarted = false;
 
-    // Make sure we clean up all dangling processes
-    process.exit(0);
+    if (code === 0 || isBeingKilled) {
+      // If we exited succesfully or we are getting killed, stop event watcher
+      watchEventBus.emit(watchEventBus.Events.Stop);
+    }
   });
-  if (defaultedProps.logging) {
+  if (logging) {
     runEventBus.pipe(logEventBus);
   }
 
@@ -106,6 +146,7 @@ export default (props: LibProps): LibEventBus => {
   installEventBus.emit(installEventBus.Events.Install);
 
   libEventBus.onKill(() => {
+    isBeingKilled = true;
     isStarted = false;
     runEventBus.kill();
   });
@@ -114,25 +155,7 @@ export default (props: LibProps): LibEventBus => {
 };
 
 
-/**
- * Setup signal handling
- */
-let isCleanupInProgress = false;
-const cleanup = (): void => {
-  // Only when we are already running, do the cleanup
-  if (isStarted && !isCleanupInProgress) {
-    isCleanupInProgress = true;
-
-    // Kill child process which will trigger tree-kill on main process
-    runEventBus.kill();
-  }
-};
-
-// Set system signals
-const sysSignals: NodeJS.Signals[] = ['SIGINT', 'SIGUSR1', 'SIGUSR2', 'SIGTERM'];
-sysSignals.forEach((eventType) => {
-  process.on(eventType, cleanup);
+// On process exit, make sure to kill the whole tree
+process.on('exit', () => {
+  treeKill(process.pid, 'SIGTERM');
 });
-
-// Set process exit event (not valid system signal so set it separately)
-process.on('exit', cleanup);
