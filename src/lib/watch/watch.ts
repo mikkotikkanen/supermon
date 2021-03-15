@@ -1,8 +1,13 @@
 import { watch as chokidar, FSWatcher } from 'chokidar';
-import WatchEventBus from './WatchEventBus';
+import EventBus, { WatchEvents } from '../EventBus';
 
 
 export type WatchProps = {
+  /**
+   * Event bus
+   */
+  eventBus: EventBus;
+
   /**
    * Working directory
    *
@@ -42,17 +47,18 @@ export type WatchProps = {
 }
 
 
-const eventBus = new WatchEventBus();
+// const eventBus = new WatchEventBus();
 let watcher: FSWatcher;
 let isEnabled = true;
 
 const watch = ({
+  eventBus,
   cwd = '.',
   polling = false,
   extensions = ['js', 'mjs', 'json'],
   ignore = ['./node_modules', './docs'],
   delay = 200,
-}: WatchProps): WatchEventBus => {
+}: WatchProps): void => {
   // const defaultedProps = { ...watchPropsDefaults, ...props };
   let debounceTimer: NodeJS.Timeout;
 
@@ -70,25 +76,23 @@ const watch = ({
       // Debounce repeating events
       clearTimeout(debounceTimer);
       debounceTimer = setTimeout(() => {
-        eventBus.emit(eventBus.Events.FilesChanged);
+        eventBus.emit(WatchEvents.FilesChanged);
       }, delay);
     }
   });
 
 
   // Set events to enable/disable the watcher
-  eventBus.on(eventBus.Events.Enable, () => { isEnabled = true; });
-  eventBus.on(eventBus.Events.Disable, () => {
+  eventBus.on(WatchEvents.Enable, () => { isEnabled = true; });
+  eventBus.on(WatchEvents.Disable, () => {
     clearTimeout(debounceTimer);
     isEnabled = false;
   });
 
-  eventBus.on(eventBus.Events.Stop, () => {
+  eventBus.on(WatchEvents.Stop, () => {
     watcher.close();
-    eventBus.emit(eventBus.Events.Stopped);
+    eventBus.emit(WatchEvents.Stopped);
   });
-
-  return eventBus;
 };
 
 export default watch;

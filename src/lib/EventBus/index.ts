@@ -4,7 +4,7 @@ export type EventBusProps = {
   /**
    * Log events out
    */
-  debug: boolean;
+  debug?: boolean;
 }
 
 
@@ -38,7 +38,7 @@ export default class EventBus extends EventEmitter {
 
   constructor({
     debug = false,
-  }: EventBusProps) {
+  }: EventBusProps = {}) {
     super();
     this.debug = debug;
   }
@@ -46,7 +46,7 @@ export default class EventBus extends EventEmitter {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   emit(event: string, ...args: any[]): boolean {
     if (this.debug) {
-      console.log(`Event "${event}" emitted.`);
+      console.log(`Event emitted. (${event})`);
     }
 
     return super.emit(event, ...args);

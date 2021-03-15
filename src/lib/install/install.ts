@@ -5,27 +5,34 @@ import { runOnce } from '../run';
 import dependencyDiff, { Diff } from './dependencyDiff';
 import LoadPackageJSON from './loadPackageJSON';
 import { set, get } from './store';
-import InstallEventBus from './InstallEventBus';
+import EventBus, { InstallEvents } from '../EventBus';
+// import InstallEventBus from './InstallEventBus';
 
 type installProps = {
+  /**
+   * Event bus
+   */
+  eventBus: EventBus;
+
   /**
    * Wheter or not do to the first run full sync
    */
   firstRunSync: boolean;
 }
 
-let installEventBus: InstallEventBus;
+// let installEventBus: InstallEventBus;
 const cwd = '.';
 const packageJSONPath = join(cwd, 'package.json');
 const nodeModulesPath = join(cwd, 'node_modules');
 
 
 const install = ({
+  eventBus,
   firstRunSync = true,
-}: installProps): InstallEventBus => {
-  installEventBus = new InstallEventBus();
+}: installProps): void => {
+  // installEventBus = new InstallEventBus();
 
-  installEventBus.on(installEventBus.Events.Install, () => {
+  eventBus.on(InstallEvents.Install, () => {
     // Load main package.json
     const packageJSON = LoadPackageJSON(packageJSONPath);
     if (!packageJSON) {
@@ -121,7 +128,7 @@ const install = ({
       .then(() => {
         // Push installed event to message queue (make sure all message handlers are registered)
         setTimeout(() => {
-          installEventBus.emit(installEventBus.Events.Installed);
+          eventBus.emit(InstallEvents.Installed);
         }, 0);
       })
 
@@ -132,8 +139,6 @@ const install = ({
         throw new Error('Failed dependency sync.');
       });
   });
-
-  return installEventBus;
 };
 
 export default install;
