@@ -2,7 +2,14 @@ import EventBus, { ChildEvents } from '../EventBus';
 import { Run } from './Run';
 
 type runRestartableProps = {
+  /**
+   * Event bus
+   */
   eventBus: EventBus;
+
+  /**
+   * Command
+   */
   command: string;
 }
 
