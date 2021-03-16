@@ -1,8 +1,8 @@
 import { extname } from 'path';
 import treeKill from 'tree-kill';
 import { existsSync } from 'fs';
-import { install } from './install';
-import { watch } from './watch';
+import install from './install';
+import watch from './watch';
 import { runRestartable } from './run';
 import logger from './logger';
 import LibEventBus from './LibEventBus';
