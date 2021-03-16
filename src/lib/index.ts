@@ -44,7 +44,7 @@ let isBeingKilled = false;
  */
 export default ({
   executable,
-  debug = true,
+  debug = false,
   delay = 200,
   logging = true,
   polling = false,
@@ -105,13 +105,10 @@ export default ({
 
   // Setup the requested command
   const engine = (isTypeScript ? 'ts-node' : 'node');
-  const runEventBus = runRestartable(`${engine} ${executable}`);
-  eventBus.on(ChildEvents.Restart, () => runEventBus.emit(runEventBus.Events.Restart));
-  runEventBus.on(runEventBus.Events.Restarted, () => eventBus.emit(ChildEvents.Restarted));
-  eventBus.on(ChildEvents.Start, () => runEventBus.emit(runEventBus.Events.Start));
-  runEventBus.on(runEventBus.Events.Started, () => eventBus.emit(ChildEvents.Started));
-  eventBus.on(ChildEvents.Stop, () => runEventBus.emit(runEventBus.Events.Stop));
-  runEventBus.on(runEventBus.Events.Stopped, () => eventBus.emit(ChildEvents.Stopped));
+  runRestartable({
+    eventBus,
+    command: `${engine} ${executable}`,
+  });
 
   eventBus.on(ChildEvents.Started, () => {
     libEventBus.emit(libEventBus.Events.Started); // Temporary
