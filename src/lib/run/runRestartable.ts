@@ -1,13 +1,11 @@
 import EventBus, { ChildEvents } from '../EventBus';
 import { Run } from './Run';
-// import RunEventBus from './RunEventBus';
 
 type runRestartableProps = {
   eventBus: EventBus;
   command: string;
 }
 
-// const runEventBus = new RunEventBus();
 let isRestarting = false;
 
 
@@ -45,8 +43,5 @@ export default ({
   });
 
   // Pass kill request to execution eventbus
-  // runEventBus.onKill(() => run.eventBus.kill());
   eventBus.on(ChildEvents.Stop, () => run.eventBus.kill());
-
-  // return runEventBus;
 };
