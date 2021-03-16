@@ -1,47 +1,51 @@
 import { spawn } from 'child_process';
 import kill from 'tree-kill';
-import RunEventBus from './RunEventBus';
+import EventBus from '../EventBus';
 
 
 export interface RunProps {
+  command: string;
   cwd?: string;
-  autostart: boolean;
+  autostart?: boolean;
 }
-const runPropsDefaults: RunProps = {
-  cwd: '.',
-  autostart: true,
-};
+
+export enum Events {
+  Start = 'Start',
+  Started = 'Started',
+  Stop = 'Stop',
+  Stopped = 'Stopped',
+}
 
 
 export class Run {
   private command: string;
 
-  private props: RunProps;
+  private cwd?: string;
 
   private pid = 0;
 
-  eventBus = new RunEventBus();
+  readonly Events = Events;
 
-  constructor(command: string, props?: RunProps) {
-    const defaultedProps = { ...runPropsDefaults, ...props };
+  eventBus: EventBus = new EventBus();
 
+  constructor({
+    command,
+    cwd,
+    autostart = true,
+  }: RunProps) {
     this.command = command;
-    this.props = defaultedProps;
+    this.cwd = cwd;
 
-    this.eventBus.on(this.eventBus.Events.Start, () => {
-      // this.execute();
-    });
-
-    this.eventBus.onKill(() => {
+    this.eventBus.on(this.Events.Stop, (() => {
       if (!this.pid) {
         throw new Error("Can't kill child process, no process is running.");
       } else {
         kill(this.pid, 'SIGTERM');
       }
-    });
+    }));
 
-    if (defaultedProps.autostart) {
-      this.eventBus.emit(this.eventBus.Events.Start);
+    if (autostart) {
+      this.eventBus.emit(this.Events.Start);
     }
   }
 
@@ -53,7 +57,7 @@ export class Run {
   execute(): void {
     // Start child process
     const child = spawn(this.command, { // child event handlers are left behind after restart
-      cwd: this.props.cwd,
+      cwd: this.cwd,
       shell: true,
       stdio: 'inherit',
     });
@@ -62,10 +66,10 @@ export class Run {
     child.on('close', (code: number) => {
       if (this.pid) {
         this.pid = 0;
-        this.eventBus.emit(this.eventBus.Events.Stopped, code);
+        this.eventBus.emit(this.Events.Stopped, code);
       }
     });
 
-    this.eventBus.emit(this.eventBus.Events.Started);
+    this.eventBus.emit(this.Events.Started);
   }
 }

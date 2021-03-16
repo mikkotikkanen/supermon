@@ -20,9 +20,9 @@ export default ({
   eventBus,
   command,
 }: runRestartableProps): void => {
-  const run = new Run(command);
+  const run = new Run({ command });
 
-  run.eventBus.on(run.eventBus.Events.Started, () => {
+  run.eventBus.on(run.Events.Started, () => {
     if (isRestarting) {
       isRestarting = false;
       eventBus.emit(ChildEvents.Restarted);
@@ -31,7 +31,7 @@ export default ({
     }
   });
 
-  run.eventBus.on(run.eventBus.Events.Stopped, (code) => {
+  run.eventBus.on(run.Events.Stopped, (code) => {
     if (isRestarting) {
       eventBus.emit(ChildEvents.Start);
     } else if (!run.isRunning()) {
@@ -46,9 +46,9 @@ export default ({
 
   eventBus.on(ChildEvents.Restart, () => {
     isRestarting = true;
-    run.eventBus.kill();
+    run.eventBus.emit(run.Events.Stop);
   });
 
   // Pass kill request to execution eventbus
-  eventBus.on(ChildEvents.Stop, () => run.eventBus.kill());
+  eventBus.on(ChildEvents.Stop, () => run.eventBus.emit(run.Events.Stop));
 };
