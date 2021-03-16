@@ -1,43 +1,52 @@
+import EventBus, { ChildEvents } from '../EventBus';
 import { Run } from './Run';
-import RunEventBus from './RunEventBus';
+// import RunEventBus from './RunEventBus';
 
+type runRestartableProps = {
+  eventBus: EventBus;
+  command: string;
+}
 
-const runEventBus = new RunEventBus();
+// const runEventBus = new RunEventBus();
 let isRestarting = false;
 
 
-export default (command: string): RunEventBus => {
+export default ({
+  eventBus,
+  command,
+}: runRestartableProps): void => {
   const run = new Run(command);
 
   run.eventBus.on(run.eventBus.Events.Started, () => {
     if (isRestarting) {
       isRestarting = false;
-      runEventBus.emit(runEventBus.Events.Restarted);
+      eventBus.emit(ChildEvents.Restarted);
     } else {
-      runEventBus.emit(runEventBus.Events.Started);
+      eventBus.emit(ChildEvents.Started);
     }
   });
 
   run.eventBus.on(run.eventBus.Events.Stopped, (code) => {
     if (isRestarting) {
-      runEventBus.emit(runEventBus.Events.Start);
+      eventBus.emit(ChildEvents.Start);
     } else if (!run.isRunning()) {
-      runEventBus.emit(runEventBus.Events.Stopped, code);
+      eventBus.emit(ChildEvents.Stopped, code);
     }
   });
 
   // Set main event emitter events
-  runEventBus.on(runEventBus.Events.Start, () => {
+  eventBus.on(ChildEvents.Start, () => {
     run.execute();
   });
 
-  runEventBus.on(runEventBus.Events.Restart, () => {
+  eventBus.on(ChildEvents.Restart, () => {
     isRestarting = true;
     run.eventBus.kill();
   });
 
   // Pass kill request to execution eventbus
-  runEventBus.onKill(() => run.eventBus.kill());
+  // runEventBus.onKill(() => run.eventBus.kill());
+  eventBus.on(ChildEvents.Stop, () => run.eventBus.kill());
 
-  return runEventBus;
+  // return runEventBus;
 };
