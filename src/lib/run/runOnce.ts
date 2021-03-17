@@ -11,5 +11,5 @@ export default (command: string): Promise<void> => new Promise((resolve, reject)
     }
   });
 
-  run.execute();
+  run.start();
 });

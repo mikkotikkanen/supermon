@@ -39,7 +39,7 @@ export default ({
 
   // Set main event emitter events
   eventBus.on(ChildEvents.Start, () => {
-    run.execute();
+    run.start();
   });
 
   eventBus.on(ChildEvents.Restart, () => {

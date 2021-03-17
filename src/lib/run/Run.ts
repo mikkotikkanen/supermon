@@ -49,7 +49,7 @@ export class Run {
     }
 
     this.eventBus.on(this.Events.Start, () => {
-      this.execute();
+      this.start();
     });
   }
 
@@ -58,7 +58,7 @@ export class Run {
     return this.pid !== 0;
   }
 
-  execute(): void {
+  start(): void {
     // Start child process
     const child = spawn(this.command, { // child event handlers are left behind after restart
       cwd: this.cwd,
