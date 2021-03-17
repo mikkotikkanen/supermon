@@ -10,10 +10,10 @@ export interface RunProps {
 }
 
 export enum Events {
-  Start = 'Start',
-  Started = 'Started',
-  Stop = 'Stop',
-  Stopped = 'Stopped',
+  Start = 'RUN_START',
+  Started = 'RUN_STARTED',
+  Stop = 'RUN_STOP',
+  Stopped = 'RUN_STOPPED',
 }
 
 
@@ -47,6 +47,10 @@ export class Run {
     if (autostart) {
       this.eventBus.emit(this.Events.Start);
     }
+
+    this.eventBus.on(this.Events.Start, () => {
+      this.execute();
+    });
   }
 
 
