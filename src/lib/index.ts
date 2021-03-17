@@ -5,7 +5,12 @@ import install from './install';
 import watch from './watch';
 import { runRestartable } from './run';
 import logger from './logger';
-import EventBus, { ChildEvents, InstallEvents, WatchEvents } from './EventBus';
+import EventBus, {
+  ChildEvents,
+  InstallEvents,
+  ProcessEvents,
+  WatchEvents,
+} from './EventBus';
 
 
 export interface LibProps {
@@ -74,6 +79,8 @@ export default ({
   const eventBus = new EventBus({
     debug,
   });
+
+  eventBus.emit(ProcessEvents.Start);
 
   if (!existsSync(watchdir)) {
     throw new Error(`Path "${watchdir}" does not exist.`);
