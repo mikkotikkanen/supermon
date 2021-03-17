@@ -9,10 +9,31 @@ import EventBus, { ChildEvents, InstallEvents, WatchEvents } from './EventBus';
 
 
 export interface LibProps {
+  /**
+   * Command for child process
+   */
   executable: string;
+
+  /**
+   * Directory to watch file events for
+   */
   watchdir?: string;
+
+  /**
+   * Use polling instead of file system events
+   *
+   * Useful for fe. running on Docker container where FS events arent propagated to host
+   */
   polling?: boolean;
+
+  /**
+   * Log things to console
+   */
   logging?: boolean;
+
+  /**
+   * Debug flag. Log all events to console
+   */
   debug?: boolean;
 
   /**
