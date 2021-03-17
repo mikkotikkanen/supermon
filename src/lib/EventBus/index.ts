@@ -7,6 +7,9 @@ export type EventBusProps = {
   debug?: boolean;
 }
 
+export enum ProcessEvents {
+  Start = 'PROCESS_START',
+}
 
 export enum ChildEvents {
   Start = 'CHILD_START',
