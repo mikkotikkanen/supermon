@@ -4,9 +4,25 @@ import EventBus from '../EventBus';
 
 
 export interface RunProps {
+  /**
+   * Command to execute the child process with
+   */
   command: string;
+
+  /**
+   * Working directory
+   */
   cwd?: string;
+
+  /**
+   * Should the process be started automatically
+   */
   autostart?: boolean;
+
+  /**
+   * Debug flag. Log all events to console
+   */
+  debug?: boolean;
 }
 
 export enum Events {
@@ -26,15 +42,19 @@ export class Run {
 
   readonly Events = Events;
 
-  eventBus: EventBus = new EventBus();
+  eventBus: EventBus;
 
   constructor({
     command,
     cwd,
     autostart = true,
+    debug = false,
   }: RunProps) {
     this.command = command;
     this.cwd = cwd;
+    this.eventBus = new EventBus({
+      debug,
+    });
 
     this.eventBus.on(this.Events.Stop, (() => {
       if (!this.pid) {
