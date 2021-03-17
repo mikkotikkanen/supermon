@@ -1,8 +1,4 @@
 import { grey } from 'chalk';
-// import EventBus from '../utils/EventBus';
-// import { WatchEventBus } from '../watch';
-// import { RunEventBus } from '../run';
-// import { RunEvents } from '../run/RunEventBus';
 import EventBus, { ChildEvents, WatchEvents } from '../EventBus';
 
 export type LoggerProps = {
@@ -10,11 +6,25 @@ export type LoggerProps = {
 }
 
 
+/**
+ * Log message with "supermon" prefix
+ *
+ * @param message Message to log
+ * @param args Rest of the arguments given to the function
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const log = (message?: string, ...args: any[]) => {
+  const logPrefix = `[${grey('supermon')}] `;
+  if (message) {
+    console.log(`${logPrefix} ${message}`, ...args);
+  } else {
+    console.log('');
+  }
+};
+
 const Logger = ({
   eventBus,
 }: LoggerProps): void => {
-  // const eventBus = new EventBus();
-  const logPrefix = `[${grey('supermon')}] `;
   let isStarted = false;
 
 
@@ -34,15 +44,15 @@ const Logger = ({
    */
   eventBus.on(WatchEvents.FilesChanged, () => {
     if (isStarted) {
-      console.log('');
-      console.log(`${logPrefix} File change detected. Restarting application.`);
-      console.log('');
+      log();
+      log('File change detected. Restarting child process.');
+      log();
     }
   });
   eventBus.on(ChildEvents.Stopped, () => {
     isStarted = false;
-    console.log('');
-    console.log(`${logPrefix} Application exited.`);
+    log();
+    log('Child process exited.');
   });
 };
 
