@@ -25,15 +25,13 @@ export default ({
   run.eventBus.on(run.Events.Started, () => {
     if (isRestarting) {
       isRestarting = false;
-      eventBus.emit(ChildEvents.Restarted);
-    } else {
-      eventBus.emit(ChildEvents.Started);
     }
+    eventBus.emit(ChildEvents.Started);
   });
 
   run.eventBus.on(run.Events.Stopped, (code) => {
     if (isRestarting) {
-      eventBus.emit(ChildEvents.Start);
+      run.eventBus.emit(run.Events.Start);
     } else if (!run.isRunning()) {
       eventBus.emit(ChildEvents.Stopped, code);
     }
