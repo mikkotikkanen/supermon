@@ -2,12 +2,13 @@ import { writeFileSync } from 'fs';
 import { join } from 'path';
 import getWorkDir from './lib/getWorkDir';
 import lib from '../lib';
-import LibEventBus from '../lib/LibEventBus';
+import EventBus, { ChildEvents } from '../lib/EventBus';
+// import LibEventBus from '../lib/LibEventBus';
 
 let workDir: string;
 let appFile: string;
 let touchFile: string;
-let eventBus: LibEventBus;
+let eventBus: EventBus;
 
 beforeAll(() => {
   workDir = getWorkDir();
@@ -33,14 +34,14 @@ test('Application should restart on file change', () => new Promise<void>((resol
     // debug: true,
   });
 
-  eventBus.on(eventBus.Events.Started, () => {
+  eventBus.on(ChildEvents.Started, () => {
     // Wait a bit to make sure watcher is initialized
     setTimeout(() => {
       writeFileSync(touchFile, `${process.hrtime.bigint()}`, { encoding: 'utf8' });
     }, 100);
   });
 
-  eventBus.on(eventBus.Events.Restarted, () => {
+  eventBus.on(ChildEvents.Restarted, () => {
     expect(true).toBeTruthy();
     resolve();
   });
@@ -48,5 +49,6 @@ test('Application should restart on file change', () => new Promise<void>((resol
 
 afterAll(() => {
   // Make sure the process is killed
-  eventBus.kill();
+  // eventBus.kill();
+  eventBus.emit(ChildEvents.Stop);
 });

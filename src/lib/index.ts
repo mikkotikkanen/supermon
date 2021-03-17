@@ -5,7 +5,6 @@ import install from './install';
 import watch from './watch';
 import { runRestartable } from './run';
 import logger from './logger';
-import LibEventBus from './LibEventBus';
 import EventBus, { ChildEvents, InstallEvents, WatchEvents } from './EventBus';
 
 
@@ -34,7 +33,6 @@ export interface LibProps {
 }
 
 
-const libEventBus = new LibEventBus();
 let isStarted = false;
 let isBeingKilled = false;
 
@@ -50,7 +48,7 @@ export default ({
   polling = false,
   firstRunSync = true,
   watchdir = '.',
-}: LibProps): LibEventBus => {
+}: LibProps): EventBus => {
   const isTypeScript = extname(executable) === '.ts';
   const eventBus = new EventBus({
     debug,
@@ -111,14 +109,10 @@ export default ({
   });
 
   eventBus.on(ChildEvents.Started, () => {
-    libEventBus.emit(libEventBus.Events.Started); // Temporary
     isStarted = true;
-  });
-  eventBus.on(ChildEvents.Restarted, () => {
-    libEventBus.emit(libEventBus.Events.Restarted);
+    isBeingKilled = false;
   });
   eventBus.on(ChildEvents.Stopped, (code) => {
-    libEventBus.emit(libEventBus.Events.Stopped); // Temporary
     isStarted = false;
 
     // If we exited succesfully or we are getting killed, stop event watcher
@@ -130,13 +124,11 @@ export default ({
   // Start with install
   eventBus.emit(InstallEvents.Install);
 
-  libEventBus.onKill(() => {
+  eventBus.on(ChildEvents.Stop, () => {
     isBeingKilled = true;
-    isStarted = false;
-    eventBus.emit(ChildEvents.Stop);
   });
 
-  return libEventBus;
+  return eventBus;
 };
 
 
