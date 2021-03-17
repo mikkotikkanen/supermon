@@ -1,18 +1,39 @@
 import { extname } from 'path';
 import treeKill from 'tree-kill';
 import { existsSync } from 'fs';
-import { install, InstallEventBus } from './install';
-import { watch, WatchEventBus } from './watch';
-import { runRestartable, RunEventBus } from './run';
+import install from './install';
+import watch from './watch';
+import { runRestartable } from './run';
 import logger from './logger';
-import LibEventBus from './LibEventBus';
+import EventBus, { ChildEvents, InstallEvents, WatchEvents } from './EventBus';
 
 
 export interface LibProps {
+  /**
+   * Command for child process
+   */
   executable: string;
+
+  /**
+   * Directory to watch file events for
+   */
   watchdir?: string;
+
+  /**
+   * Use polling instead of file system events
+   *
+   * Useful for fe. running on Docker container where FS events arent propagated to host
+   */
   polling?: boolean;
+
+  /**
+   * Log things to console
+   */
   logging?: boolean;
+
+  /**
+   * Debug flag. Log all events to console
+   */
   debug?: boolean;
 
   /**
@@ -33,14 +54,8 @@ export interface LibProps {
 }
 
 
-const libEventBus = new LibEventBus();
-let runEventBus: RunEventBus;
-let watchEventBus: WatchEventBus;
-let installEventBus: InstallEventBus;
-const logEventBus = logger();
 let isStarted = false;
 let isBeingKilled = false;
-// const isInstalling = false;
 
 
 /**
@@ -54,106 +69,87 @@ export default ({
   polling = false,
   firstRunSync = true,
   watchdir = '.',
-}: LibProps): LibEventBus => {
+}: LibProps): EventBus => {
   const isTypeScript = extname(executable) === '.ts';
+  const eventBus = new EventBus({
+    debug,
+  });
 
   if (!existsSync(watchdir)) {
     throw new Error(`Path "${watchdir}" does not exist.`);
   }
 
+  if (logging) {
+    logger({
+      eventBus,
+    });
+  }
+
   // Setup watcher
-  watchEventBus = watch({
+  watch({
+    eventBus,
     cwd: watchdir,
     polling,
     extensions: (isTypeScript ? ['ts', 'tsx', 'json'] : ['js', 'mjs', 'jsx', 'json']),
     delay,
   });
-  watchEventBus.on(watchEventBus.Events.FilesChanged, () => {
-    if (debug) {
-      console.log('index, CHANGED');
-    }
-
+  eventBus.on(WatchEvents.FilesChanged, () => {
     // Only start emitting watch events once the child process is running
     if (isStarted) {
-      installEventBus.emit(installEventBus.Events.Install);
+      eventBus.emit(InstallEvents.Install);
     }
   });
-  if (logging) {
-    watchEventBus.pipe(logEventBus);
-  }
 
 
   // Setup installer
-  installEventBus = install({
+  install({
+    eventBus,
     firstRunSync,
   });
-  installEventBus.on(installEventBus.Events.Install, () => {
-    if (debug) {
-      console.log('index, INSTALL');
-    }
-    watchEventBus.emit(watchEventBus.Events.Disable);
+  eventBus.on(InstallEvents.Install, () => {
+    eventBus.emit(WatchEvents.Disable);
   });
-  installEventBus.on(installEventBus.Events.Installed, () => {
-    if (debug) {
-      console.log('index, INSTALLED');
-    }
-    watchEventBus.emit(watchEventBus.Events.Enable);
+  eventBus.on(InstallEvents.Installed, () => {
+    eventBus.emit(WatchEvents.Enable);
 
     // Only trigger restart if child process has been started already
     if (isStarted) {
       isStarted = false;
-      runEventBus.emit(runEventBus.Events.Restart);
+      eventBus.emit(ChildEvents.Restart);
     } else {
-      runEventBus.emit(runEventBus.Events.Start);
+      eventBus.emit(ChildEvents.Start);
     }
   });
 
 
   // Setup the requested command
   const engine = (isTypeScript ? 'ts-node' : 'node');
-  runEventBus = runRestartable(`${engine} ${executable}`);
-  runEventBus.on(runEventBus.Events.Started, () => {
-    if (debug) {
-      console.log('index, STARTED');
-    }
+  runRestartable({
+    eventBus,
+    command: `${engine} ${executable}`,
+  });
 
-    libEventBus.emit(libEventBus.Events.Started); // Temporary
+  eventBus.on(ChildEvents.Started, () => {
     isStarted = true;
+    isBeingKilled = false;
   });
-  runEventBus.on(runEventBus.Events.Restarted, () => {
-    if (debug) {
-      console.log('index, RESTARTED');
-    }
-
-    libEventBus.emit(libEventBus.Events.Restarted);
-  });
-  runEventBus.on(runEventBus.Events.Stopped, (code) => {
-    if (debug) {
-      console.log(`index, STOPPED (code: ${code})`);
-    }
-
-    libEventBus.emit(libEventBus.Events.Stopped); // Temporary
+  eventBus.on(ChildEvents.Stopped, (code) => {
     isStarted = false;
 
+    // If we exited succesfully or we are getting killed, stop event watcher
     if (code === 0 || isBeingKilled) {
-      // If we exited succesfully or we are getting killed, stop event watcher
-      watchEventBus.emit(watchEventBus.Events.Stop);
+      eventBus.emit(WatchEvents.Stop);
     }
   });
-  if (logging) {
-    runEventBus.pipe(logEventBus);
-  }
 
   // Start with install
-  installEventBus.emit(installEventBus.Events.Install);
+  eventBus.emit(InstallEvents.Install);
 
-  libEventBus.onKill(() => {
+  eventBus.on(ChildEvents.Stop, () => {
     isBeingKilled = true;
-    isStarted = false;
-    runEventBus.kill();
   });
 
-  return libEventBus;
+  return eventBus;
 };
 
 

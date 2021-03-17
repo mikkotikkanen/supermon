@@ -11,11 +11,8 @@
  */
 const arg = process.argv.pop() as string;
 const waitInSeconds = parseInt(arg, 10) || 1; // Default to 1 second
-let temp = 1;
 
 setTimeout(() => {
   // Keep the app running for set time
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  temp += 1;
-  console.log(temp);
 }, waitInSeconds * 1000);

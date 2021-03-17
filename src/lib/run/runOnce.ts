@@ -1,9 +1,9 @@
 import { Run } from './Run';
 
 export default (command: string): Promise<void> => new Promise((resolve, reject) => {
-  const run = new Run(command);
+  const run = new Run({ command });
 
-  run.eventBus.on(run.eventBus.Events.Stopped, (code) => {
+  run.eventBus.on(run.Events.Stopped, (code) => {
     if (code) {
       reject(code);
     } else {
@@ -11,5 +11,5 @@ export default (command: string): Promise<void> => new Promise((resolve, reject)
     }
   });
 
-  run.execute();
+  run.start();
 });

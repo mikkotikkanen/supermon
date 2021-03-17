@@ -35,6 +35,10 @@ yargs
     type: 'boolean',
     describe: "Don't do full sync on first run",
   })
+  .option('debug', {
+    type: 'boolean',
+    describe: 'Show debug information',
+  })
   .version(false) // Set custom version option to avoid "[boolean]" flag in help
   .option('version', {
     describe: 'Show version number',

@@ -49,7 +49,7 @@
   },
   "scripts": {
     "dev": "tsc --watch",
-    "dev-test-server": "supermon ./dist/test/apps/test-server.js",
+    "dev-test-server": "ts-node ./src/bin/cli.ts ./dist/test/apps/test-server.js --debug",
     "dev-help": "ts-node ./src/bin/cli.ts --help",
     "test": "npm-run-all test:*",
     "test:eslint": "eslint --ext .js,.ts .",
