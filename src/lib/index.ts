@@ -90,7 +90,11 @@ export default ({
     });
   }
 
-  eventBus.emit(ProcessEvents.Start);
+  const props: LibProps = {
+    executable,
+    watchdir,
+  };
+  eventBus.emit(ProcessEvents.Start, props);
 
   // Setup watcher
   watch({
