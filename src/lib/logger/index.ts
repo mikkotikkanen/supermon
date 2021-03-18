@@ -1,13 +1,18 @@
 import { grey } from 'chalk';
 import { join } from 'path';
+import { LibProps } from '..';
 import EventBus, {
   ChildEvents,
+  LogEvents,
   ProcessEvents,
   WatchEvents,
 } from '../EventBus';
 import loadPackageJSON from '../install/loadPackageJSON';
 
 export type LoggerProps = {
+  /**
+   * Event bus
+   */
   eventBus: EventBus,
 }
 
@@ -30,7 +35,7 @@ const log = (message?: string, ...args: any[]) => {
 /**
  * Log messages to console
  */
-const Logger = ({
+const logger = ({
   eventBus,
 }: LoggerProps): void => {
   let isRunning = false;
@@ -39,15 +44,27 @@ const Logger = ({
   /**
    * Process events
    */
-  eventBus.on(ProcessEvents.Start, () => {
+  eventBus.on(ProcessEvents.Start, ({
+    executable,
+    watchdir,
+  }: LibProps) => {
     const pckg = loadPackageJSON(join(__dirname, '..', '..', '..', 'package.json'));
     if (!pckg) {
       throw new Error('Failed to load module package.json');
     }
 
     log();
-    log(pckg.version);
+    log(`v${pckg.version}`);
+    log(`Child process: ${executable}`);
+    log(`Watching directory: ${watchdir}`);
     log();
+  });
+
+  /**
+   * Log events
+   */
+  eventBus.on(LogEvents.Message, (message) => {
+    log(message);
   });
 
   /**
@@ -79,4 +96,4 @@ const Logger = ({
 };
 
 
-export default Logger;
+export default logger;
