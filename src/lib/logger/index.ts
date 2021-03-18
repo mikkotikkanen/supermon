@@ -1,10 +1,15 @@
 import { grey } from 'chalk';
-import EventBus, { ChildEvents, WatchEvents } from '../EventBus';
+import { join } from 'path';
+import EventBus, {
+  ChildEvents,
+  ProcessEvents,
+  WatchEvents,
+} from '../EventBus';
+import loadPackageJSON from '../install/loadPackageJSON';
 
 export type LoggerProps = {
   eventBus: EventBus,
 }
-
 
 /**
  * Log message with "supermon" prefix
@@ -22,20 +27,37 @@ const log = (message?: string, ...args: any[]) => {
   }
 };
 
+/**
+ * Log messages to console
+ */
 const Logger = ({
   eventBus,
 }: LoggerProps): void => {
-  let isStarted = false;
+  let isRunning = false;
 
 
   /**
-   * Run events
+   * Process events
+   */
+  eventBus.on(ProcessEvents.Start, () => {
+    const pckg = loadPackageJSON(join(__dirname, '..', '..', '..', 'package.json'));
+    if (!pckg) {
+      throw new Error('Failed to load module package.json');
+    }
+
+    log();
+    log(pckg.version);
+    log();
+  });
+
+  /**
+   * Child events
    */
   eventBus.on(ChildEvents.Started, () => {
-    isStarted = true;
+    isRunning = true;
   });
   eventBus.on(ChildEvents.Stopped, () => {
-    isStarted = false;
+    isRunning = false;
   });
 
 
@@ -43,14 +65,14 @@ const Logger = ({
    * Watch events
    */
   eventBus.on(WatchEvents.FilesChanged, () => {
-    if (isStarted) {
+    if (isRunning) {
       log();
-      log('File change detected. Restarting child process.');
+      log('File change(s) detected. Restarting child process...');
       log();
     }
   });
   eventBus.on(ChildEvents.Stopped, () => {
-    isStarted = false;
+    isRunning = false;
     log();
     log('Child process exited.');
   });
