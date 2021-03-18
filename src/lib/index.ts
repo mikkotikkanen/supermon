@@ -80,8 +80,6 @@ export default ({
     debug,
   });
 
-  eventBus.emit(ProcessEvents.Start);
-
   if (!existsSync(watchdir)) {
     throw new Error(`Path "${watchdir}" does not exist.`);
   }
@@ -91,6 +89,8 @@ export default ({
       eventBus,
     });
   }
+
+  eventBus.emit(ProcessEvents.Start);
 
   // Setup watcher
   watch({
