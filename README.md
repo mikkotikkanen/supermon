@@ -1,13 +1,16 @@
 # supermon
 
-![alt](https://github.com/mikkotikkanen/supermon/workflows/CI/badge.svg)
-
-## Note! Currently in development and testing, not ready for use yet
-
 nodemon replacement for pure Node.js use cases with automated new module installation detection
 and automated installation upon restart, tailored for Docker usecases where node_modules is run as
 internal volume and local npm install commands aren't reflected to internal volume. Supports
 TypeScript out of the box through [ts-node](https://www.npmjs.com/package/ts-node).
+
+![TypeScript](https://img.shields.io/badge/-TypeScript-2F74C0)
+![ESLint](https://img.shields.io/badge/-ESLint-4B32C3)
+![Jest](https://img.shields.io/badge/-Jest-99425A)
+
+![alt](https://github.com/mikkotikkanen/supermon/workflows/CI/badge.svg)
+
 
 ## Install
 
@@ -57,8 +60,17 @@ Example use: "supermon --watchdir=dist -- app.js --port=80"
 
 ## Contributing
 
-To get started with development, you need to link the local repo to be available in command line:
+### Master branch
 
-```bash
-npm link
-```
+Master branch must always represent the current deployed state, no commits are allowed directly to
+master.
+
+### Feature branches
+
+All work should be done in feature branches. Branches should have human readable name.
+
+### Merging
+
+Merging to master should happen through pull requests. Any pull request should have working tests
+for any new added feature added in the branch, should pass existing tests and should have been
+approved by at least one person before merging.
