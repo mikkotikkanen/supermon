@@ -5,8 +5,7 @@ import { runOnce } from '../run';
 import dependencyDiff, { Diff } from './dependencyDiff';
 import LoadPackageJSON from './loadPackageJSON';
 import { set, get } from './store';
-import EventBus, { InstallEvents } from '../EventBus';
-// import InstallEventBus from './InstallEventBus';
+import EventBus, { InstallEvents, LogEvents } from '../EventBus';
 
 type installProps = {
   /**
@@ -30,8 +29,6 @@ const install = ({
   eventBus,
   firstRunSync = true,
 }: installProps): void => {
-  // installEventBus = new InstallEventBus();
-
   eventBus.on(InstallEvents.Install, () => {
     // Load main package.json
     const packageJSON = LoadPackageJSON(packageJSONPath);
@@ -101,12 +98,12 @@ const install = ({
         if (!storedPackageJSON) {
           // No previously stored dependencies
           if (firstRunSync) {
-            console.log('First execution. Running full sync (install & prune)...');
+            eventBus.emit(LogEvents.Message, 'First execution. Running full sync (install & prune)...');
             await runOnce('npm install --no-audit');
             await runOnce('npm prune');
           }
         } else if (storedPackageJSON && (missingDependencies.length || extraDependencies.length)) {
-          console.log('Syncing dependencies...');
+          eventBus.emit(LogEvents.Message, 'Syncinc dependencies...');
           // Previously stored dependencies with changes
           if (missingDependencies.length) {
             await runOnce(`npm install ${missingDependencies.map((module) => `${module.name}@${module.version}`).join(' ')} --no-audit`);
@@ -133,8 +130,7 @@ const install = ({
       })
 
       .catch((err) => {
-        // TODO: Add debug flag
-        console.log('Error:', err);
+        eventBus.emit(LogEvents.Message, 'Error:', err);
 
         throw new Error('Failed dependency sync.');
       });
