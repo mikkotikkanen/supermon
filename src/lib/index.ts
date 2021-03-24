@@ -5,7 +5,12 @@ import install from './install';
 import watch from './watch';
 import { runRestartable } from './run';
 import logger from './logger';
-import EventBus, { ChildEvents, InstallEvents, WatchEvents } from './EventBus';
+import EventBus, {
+  ChildEvents,
+  InstallEvents,
+  ProcessEvents,
+  WatchEvents,
+} from './EventBus';
 
 
 export interface LibProps {
@@ -18,6 +23,11 @@ export interface LibProps {
    * Directory to watch file events for
    */
   watchdir?: string;
+
+  /**
+   * File extensions to watch
+   */
+  extensions?: string[];
 
   /**
    * Use polling instead of file system events
@@ -69,8 +79,10 @@ export default ({
   polling = false,
   firstRunSync = true,
   watchdir = '.',
+  extensions,
 }: LibProps): EventBus => {
   const isTypeScript = extname(executable) === '.ts';
+  const resolvedExtensions = extensions || (isTypeScript ? ['ts', 'tsx', 'json'] : ['js', 'mjs', 'jsx', 'json']);
   const eventBus = new EventBus({
     debug,
   });
@@ -85,12 +97,19 @@ export default ({
     });
   }
 
+  const props: LibProps = {
+    executable,
+    watchdir,
+    extensions: resolvedExtensions,
+  };
+  eventBus.emit(ProcessEvents.Start, props);
+
   // Setup watcher
   watch({
     eventBus,
     cwd: watchdir,
     polling,
-    extensions: (isTypeScript ? ['ts', 'tsx', 'json'] : ['js', 'mjs', 'jsx', 'json']),
+    extensions: resolvedExtensions,
     delay,
   });
   eventBus.on(WatchEvents.FilesChanged, () => {

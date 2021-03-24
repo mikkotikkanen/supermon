@@ -7,6 +7,13 @@ export type EventBusProps = {
   debug?: boolean;
 }
 
+export enum ProcessEvents {
+  Start = 'PROCESS_START',
+}
+
+export enum LogEvents {
+  Message = 'LOG_MESSAGE',
+}
 
 export enum ChildEvents {
   Start = 'CHILD_START',
@@ -46,7 +53,7 @@ export default class EventBus extends EventEmitter {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   emit(event: string, ...args: any[]): boolean {
     if (this.debug) {
-      console.log(`Eventbus event emit. "${event}"`);
+      super.emit(LogEvents.Message, `Eventbus event emit. "${event}"`);
     }
 
     return super.emit(event, ...args);

@@ -1,31 +1,82 @@
 import { grey } from 'chalk';
-// import EventBus from '../utils/EventBus';
-// import { WatchEventBus } from '../watch';
-// import { RunEventBus } from '../run';
-// import { RunEvents } from '../run/RunEventBus';
-import EventBus, { ChildEvents, WatchEvents } from '../EventBus';
+import { join } from 'path';
+import { LibProps } from '..';
+import EventBus, {
+  ChildEvents,
+  LogEvents,
+  ProcessEvents,
+  WatchEvents,
+} from '../EventBus';
+import loadPackageJSON from '../install/loadPackageJSON';
 
 export type LoggerProps = {
+  /**
+   * Event bus
+   */
   eventBus: EventBus,
 }
 
+/**
+ * Log message with "supermon" prefix
+ *
+ * @param message Message to log
+ * @param args Rest of the arguments given to the function
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const log = (message?: string, ...args: any[]) => {
+  const logPrefix = `[${grey('supermon')}] `;
+  if (message) {
+    console.log(`${logPrefix} ${message}`, ...args);
+  } else {
+    console.log('');
+  }
+};
 
-const Logger = ({
+/**
+ * Log messages to console
+ */
+const logger = ({
   eventBus,
 }: LoggerProps): void => {
-  // const eventBus = new EventBus();
-  const logPrefix = `[${grey('supermon')}] `;
-  let isStarted = false;
+  let isRunning = false;
 
 
   /**
-   * Run events
+   * Process events
+   */
+  eventBus.on(ProcessEvents.Start, ({
+    executable,
+    watchdir,
+    extensions,
+  }: LibProps) => {
+    const pckg = loadPackageJSON(join(__dirname, '..', '..', '..', 'package.json'));
+    if (!pckg) {
+      throw new Error('Failed to load module package.json');
+    }
+
+    log();
+    log(`v${pckg.version}`);
+    log(`Child process: ${executable}`);
+    log(`Watching directory: ${watchdir}`);
+    log(`Watching extensions: ${extensions?.join(',')}`);
+    log();
+  });
+
+  /**
+   * Log events
+   */
+  eventBus.on(LogEvents.Message, (message) => {
+    log(message);
+  });
+
+  /**
+   * Child events
    */
   eventBus.on(ChildEvents.Started, () => {
-    isStarted = true;
+    isRunning = true;
   });
   eventBus.on(ChildEvents.Stopped, () => {
-    isStarted = false;
+    isRunning = false;
   });
 
 
@@ -33,18 +84,18 @@ const Logger = ({
    * Watch events
    */
   eventBus.on(WatchEvents.FilesChanged, () => {
-    if (isStarted) {
-      console.log('');
-      console.log(`${logPrefix} File change detected. Restarting application.`);
-      console.log('');
+    if (isRunning) {
+      log();
+      log('File change(s) detected. Restarting child process...');
+      log();
     }
   });
   eventBus.on(ChildEvents.Stopped, () => {
-    isStarted = false;
-    console.log('');
-    console.log(`${logPrefix} Application exited.`);
+    isRunning = false;
+    log();
+    log('Child process exited.');
   });
 };
 
 
-export default Logger;
+export default logger;
