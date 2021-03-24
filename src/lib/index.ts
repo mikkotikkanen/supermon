@@ -25,6 +25,11 @@ export interface LibProps {
   watchdir?: string;
 
   /**
+   * File extensions to watch
+   */
+  extensions?: string[];
+
+  /**
    * Use polling instead of file system events
    *
    * Useful for fe. running on Docker container where FS events arent propagated to host
@@ -74,8 +79,10 @@ export default ({
   polling = false,
   firstRunSync = true,
   watchdir = '.',
+  extensions,
 }: LibProps): EventBus => {
   const isTypeScript = extname(executable) === '.ts';
+  const resolvedExtensions = extensions || (isTypeScript ? ['ts', 'tsx', 'json'] : ['js', 'mjs', 'jsx', 'json']);
   const eventBus = new EventBus({
     debug,
   });
@@ -93,6 +100,7 @@ export default ({
   const props: LibProps = {
     executable,
     watchdir,
+    extensions: resolvedExtensions,
   };
   eventBus.emit(ProcessEvents.Start, props);
 
@@ -101,7 +109,7 @@ export default ({
     eventBus,
     cwd: watchdir,
     polling,
-    extensions: (isTypeScript ? ['ts', 'tsx', 'json'] : ['js', 'mjs', 'jsx', 'json']),
+    extensions: resolvedExtensions,
     delay,
   });
   eventBus.on(WatchEvents.FilesChanged, () => {

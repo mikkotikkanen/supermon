@@ -47,6 +47,7 @@ const logger = ({
   eventBus.on(ProcessEvents.Start, ({
     executable,
     watchdir,
+    extensions,
   }: LibProps) => {
     const pckg = loadPackageJSON(join(__dirname, '..', '..', '..', 'package.json'));
     if (!pckg) {
@@ -57,6 +58,7 @@ const logger = ({
     log(`v${pckg.version}`);
     log(`Child process: ${executable}`);
     log(`Watching directory: ${watchdir}`);
+    log(`Watching extensions: ${extensions?.join(',')}`);
     log();
   });
 
