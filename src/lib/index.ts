@@ -1,13 +1,13 @@
 import { extname } from 'path';
 import treeKill from 'tree-kill';
 import { existsSync } from 'fs';
-import install from './install';
+import modules from './modules';
 import watch from './watch';
-import { runRestartable } from './run';
+import { runRestartable } from './child';
 import logger from './logger';
 import EventBus, {
   ChildEvents,
-  InstallEvents,
+  ModulesEvents,
   ProcessEvents,
   WatchEvents,
 } from './EventBus';
@@ -115,20 +115,20 @@ export default ({
   eventBus.on(WatchEvents.FilesChanged, () => {
     // Only start emitting watch events once the child process is running
     if (isStarted) {
-      eventBus.emit(InstallEvents.Install);
+      eventBus.emit(ModulesEvents.Install);
     }
   });
 
 
   // Setup installer
-  install({
+  modules({
     eventBus,
     firstRunSync,
   });
-  eventBus.on(InstallEvents.Install, () => {
+  eventBus.on(ModulesEvents.Install, () => {
     eventBus.emit(WatchEvents.Disable);
   });
-  eventBus.on(InstallEvents.Installed, () => {
+  eventBus.on(ModulesEvents.Installed, () => {
     eventBus.emit(WatchEvents.Enable);
 
     // Only trigger restart if child process has been started already
@@ -162,7 +162,7 @@ export default ({
   });
 
   // Start with install
-  eventBus.emit(InstallEvents.Install);
+  eventBus.emit(ModulesEvents.Install);
 
   eventBus.on(ChildEvents.Stop, () => {
     isBeingKilled = true;

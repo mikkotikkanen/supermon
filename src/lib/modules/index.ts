@@ -1,13 +1,13 @@
 import { join } from 'path';
 import { existsSync } from 'fs';
 import { satisfies } from 'semver';
-import { runOnce } from '../run';
+import { runOnce } from '../child';
 import dependencyDiff, { Diff } from './dependencyDiff';
 import LoadPackageJSON from './loadPackageJSON';
 import { set, get } from './store';
-import EventBus, { InstallEvents, LogEvents } from '../EventBus';
+import EventBus, { ModulesEvents, LogEvents } from '../EventBus';
 
-type installProps = {
+type modulesProps = {
   /**
    * Event bus
    */
@@ -25,11 +25,11 @@ const packageJSONPath = join(cwd, 'package.json');
 const nodeModulesPath = join(cwd, 'node_modules');
 
 
-const install = ({
+const modules = ({
   eventBus,
   firstRunSync = true,
-}: installProps): void => {
-  eventBus.on(InstallEvents.Install, () => {
+}: modulesProps): void => {
+  eventBus.on(ModulesEvents.Install, () => {
     // Load main package.json
     const packageJSON = LoadPackageJSON(packageJSONPath);
     if (!packageJSON) {
@@ -125,7 +125,7 @@ const install = ({
       .then(() => {
         // Push installed event to message queue (make sure all message handlers are registered)
         setTimeout(() => {
-          eventBus.emit(InstallEvents.Installed);
+          eventBus.emit(ModulesEvents.Installed);
         }, 0);
       })
 
@@ -137,4 +137,4 @@ const install = ({
   });
 };
 
-export default install;
+export default modules;
