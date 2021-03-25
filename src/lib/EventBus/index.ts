@@ -24,10 +24,10 @@ export enum ChildEvents {
   Stopped = 'CHILD_STOPPED',
 }
 
-export enum InstallEvents {
-  Install = 'INSTALL_INSTALL',
-  Installing = 'INSTALL_INSTALLING',
-  Installed = 'INSTALL_INSTALLED',
+export enum ModulesEvents {
+  Install = 'MODULES_INSTALL',
+  Installing = 'MODULES_INSTALLING',
+  Installed = 'MODULES_INSTALLED',
 }
 
 export enum WatchEvents {

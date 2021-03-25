@@ -7,7 +7,7 @@ import EventBus, {
   ProcessEvents,
   WatchEvents,
 } from '../EventBus';
-import loadPackageJSON from '../install/loadPackageJSON';
+import loadPackageJSON from '../modules/loadPackageJSON';
 
 export type LoggerProps = {
   /**
