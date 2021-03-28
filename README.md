@@ -1,16 +1,10 @@
 # supermon
 
-nodemon replacement for pure Node.js use cases with automated new module installation detection
-and automated installation upon restart, tailored for Docker usecases where node_modules is run as
-internal volume and local npm install commands aren't reflected to internal volume. Supports
-TypeScript out of the box through [ts-node](https://www.npmjs.com/package/ts-node).
-
-![TypeScript](https://img.shields.io/badge/-TypeScript-2F74C0)
-![ESLint](https://img.shields.io/badge/-ESLint-4B32C3)
-![Jest](https://img.shields.io/badge/-Jest-99425A)
-
 ![alt](https://github.com/mikkotikkanen/supermon/workflows/CI/badge.svg)
 
+Ease your Node.js development by _automatically restarting your application on file changes_ and _solve the notorious Docker node_modules sync issue_ as supermon monitors package.json file and installs any missing modules to the internal Docker volume as well. 
+
+Supports TypeScript applications out of the box through [ts-node](https://www.npmjs.com/package/ts-node).
 
 ## Install
 
@@ -27,7 +21,8 @@ npm install ts-node --save-dev
 ## Usage
 
 ```bash
-supermon <application file>
+supermon [application file]
+supermon [npm script command]
 ```
 
 Examples
@@ -35,6 +30,7 @@ Examples
 ```bash
 supermon app.js
 supermon app.ts
+supermon npm run server
 ```
 
 ## Options
