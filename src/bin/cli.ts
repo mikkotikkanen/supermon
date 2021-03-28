@@ -3,7 +3,11 @@
 import yargs from 'yargs';
 import { readFileSync } from 'fs';
 import { join } from 'path';
+import updateNotifier from 'update-notifier';
 import lib from '../lib/index';
+import loadPackageJSON from '../lib/modules/loadPackageJSON';
+
+const pckg = loadPackageJSON(join(__dirname, '..', '..', 'package.json'));
 
 yargs
   .parserConfiguration({
@@ -55,6 +59,13 @@ if (yargs.argv.help) {
   console.log('Example use: "supermon app.js"');
   console.log('Example use: "supermon --watchdir=dist -- app.js --port=80"');
   process.exit(); /* eslint-disable-line no-process-exit */
+}
+
+// Set update-notifier
+if (pckg) {
+  updateNotifier({
+    pkg: pckg,
+  });
 }
 
 
