@@ -1,4 +1,4 @@
-import { extname, basename } from 'path';
+import { extname } from 'path';
 import treeKill from 'tree-kill';
 import { existsSync } from 'fs';
 import modules from './modules';
