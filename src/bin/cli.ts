@@ -5,19 +5,6 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 import lib from '../lib/index';
 
-
-// if (argv._.length === 0) {
-//   console.log('One executable must be provided.');
-//   process.exit();
-// }
-
-// if (argv._.length > 1) {
-//   console.log('Only one executable is allowed.');
-//   process.exit();
-// }
-
-// yargs.demandCommand(1);
-
 yargs
   .parserConfiguration({
     'unknown-options-as-args': true, // Make sure to pass all unknown options to the executable
@@ -73,7 +60,7 @@ if (yargs.argv.help) {
 
 const { argv } = yargs;
 lib({
-  executable: argv._.join(' '),
+  command: argv._.join(' '),
   watchdir: argv.watchdir as string,
   polling: !argv.noFirstRunSync as boolean,
   firstRunSync: argv.firstRunSync as boolean,

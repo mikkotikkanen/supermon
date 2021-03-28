@@ -45,7 +45,7 @@ const logger = ({
    * Process events
    */
   eventBus.on(ProcessEvents.Start, ({
-    executable,
+    command: executable,
     watchdir,
     extensions,
   }: LibProps) => {

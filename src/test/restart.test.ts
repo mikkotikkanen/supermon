@@ -26,7 +26,7 @@ test('Application should restart on file change', () => new Promise<void>((resol
   let isFirstStart = true;
 
   eventBus = lib({
-    executable: `${appFile} 1`,
+    command: `${appFile} 1`,
     watchdir: workDir,
     delay: 10,
     logging: false,
