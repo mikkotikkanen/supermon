@@ -2,9 +2,9 @@
 
 ![alt](https://github.com/mikkotikkanen/supermon/workflows/CI/badge.svg)
 
-Ease your Node.js development by automatically restarting your application and installing any missing modules on file changes. supermon is tailored for Docker usecases where node_modules are stored in internal Docker volume and npm install commands on host machine aren't reflected to internal volume.
+Ease your Node.js development by _automatically restarting your application on file changes_ and _solve the notorious Docker node_modules sync issue_ as supermon monitors package.json file and installs any missing modules to the internal Docker volume as well. 
 
-Supports TypeScript out of the box through [ts-node](https://www.npmjs.com/package/ts-node).
+Supports TypeScript applications out of the box through [ts-node](https://www.npmjs.com/package/ts-node).
 
 ## Install
 
