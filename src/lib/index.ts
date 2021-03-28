@@ -17,7 +17,7 @@ export interface LibProps {
   /**
    * Command for child process
    */
-  executable: string;
+  command: string;
 
   /**
    * Directory to watch file events for
@@ -72,7 +72,7 @@ let isBeingKilled = false;
  * Setup main process
  */
 export default ({
-  executable,
+  command,
   debug = false,
   delay = 200,
   logging = true,
@@ -81,8 +81,18 @@ export default ({
   watchdir = '.',
   extensions,
 }: LibProps): EventBus => {
-  const isTypeScript = extname(executable) === '.ts';
-  const resolvedExtensions = extensions || (isTypeScript ? ['ts', 'tsx', 'json'] : ['js', 'mjs', 'jsx', 'json']);
+  // Default to node
+  let executable = 'node';
+  let resolvedExtensions = extensions || ['js', 'mjs', 'jsx', 'json'];
+  if (command.match(/^npm /)) {
+    // NPM script
+    executable = ''; // Command includes executable
+  } else if (extname(command) === '.ts') {
+    // TypeScript
+    executable = 'ts-node';
+    resolvedExtensions = extensions || ['ts', 'tsx', 'json'];
+  }
+
   const eventBus = new EventBus({
     debug,
   });
@@ -98,7 +108,7 @@ export default ({
   }
 
   const props: LibProps = {
-    executable,
+    command,
     watchdir,
     extensions: resolvedExtensions,
   };
@@ -142,10 +152,10 @@ export default ({
 
 
   // Setup the requested command
-  const engine = (isTypeScript ? 'ts-node' : 'node');
   runRestartable({
     eventBus,
-    command: `${engine} ${executable}`,
+    // If no executable is defined, just run command
+    command: (executable === '' ? `${command}` : `${executable} ${command}`),
   });
 
   eventBus.on(ChildEvents.Started, () => {
