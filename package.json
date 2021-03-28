@@ -50,7 +50,8 @@
   "scripts": {
     "dev": "tsc --watch",
     "dev-test-server": "ts-node ./src/bin/cli.ts ./dist/test/apps/test-server.js --debug",
-    "dev-help": "ts-node ./src/bin/cli.ts --help",
+    "dev-test-lib": "ts-node ./src/bin/cli.ts",
+    "dev-test-help": "ts-node ./src/bin/cli.ts --help",
     "test": "npm-run-all test:*",
     "test:eslint": "eslint --ext .js,.ts .",
     "test:tsc": "tsc --noEmit",
