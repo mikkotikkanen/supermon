@@ -20,28 +20,6 @@ export interface LibProps {
   command: string;
 
   /**
-   * Directory to watch file events for
-   */
-  watchdir?: string;
-
-  /**
-   * File extensions to watch
-   */
-  extensions?: string[];
-
-  /**
-   * Use polling instead of file system events
-   *
-   * Useful for fe. running on Docker container where FS events arent propagated to host
-   */
-  polling?: boolean;
-
-  /**
-   * Log things to console
-   */
-  logging?: boolean;
-
-  /**
    * Debug flag. Log all events to console
    */
   debug?: boolean;
@@ -56,11 +34,33 @@ export interface LibProps {
   delay?: number;
 
   /**
+   * File extensions to watch
+   */
+  extensions?: string[];
+
+  /**
    * Wheter or not to do full sync on first run
    *
    * Default: true
    */
   firstRunSync?: boolean;
+
+  /**
+   * Log things to console
+   */
+  logging?: boolean;
+
+  /**
+   * Use polling instead of file system events
+   *
+   * Useful for fe. running on Docker container where FS events arent propagated to host
+   */
+  polling?: boolean;
+
+  /**
+   * Directory to watch file events for
+   */
+  watchdir?: string;
 }
 
 
@@ -75,11 +75,11 @@ export default ({
   command,
   debug = false,
   delay = 200,
+  extensions,
+  firstRunSync = true,
   logging = true,
   polling = false,
-  firstRunSync = true,
   watchdir = '.',
-  extensions,
 }: LibProps): EventBus => {
   // Default to node
   let executable = 'node';
