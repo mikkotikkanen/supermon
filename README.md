@@ -1,8 +1,13 @@
 # supermon
 
+![](screenshot.png)
+
+
 ![alt](https://github.com/mikkotikkanen/supermon/workflows/CI/badge.svg)
 
-Ease your Node.js development by _automatically restarting your application on file changes_ and _solve the notorious Docker node_modules sync issue_ as supermon monitors package.json file and installs any missing modules to the internal Docker volume as well. 
+Ease your Node.js development by _automatically restarting your application on file changes_ and
+_solve the notorious Docker node_modules sync issue_ as supermon monitors package.json file and
+installs any missing modules to the internal Docker volume as well. 
 
 Supports TypeScript applications out of the box through [ts-node](https://www.npmjs.com/package/ts-node).
 
