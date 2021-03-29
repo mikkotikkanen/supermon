@@ -15,19 +15,29 @@ yargs
   })
   .env('SUPERMON')
   .option('watchdir', {
-    type: 'string',
+    // type: 'string',
     describe: 'Which directory to watch for changes',
+    default: '.',
+  })
+  .option('extensions', {
+    // type: 'string',
+    describe: 'Comma separated list of file extensions to watch',
+  })
+  .option('delay', {
+    // type: 'number',
+    describe: 'How many ms to wait after file changes',
+    default: 200,
   })
   .option('polling', {
-    type: 'boolean',
+    // type: 'boolean',
     describe: 'Use polling (CPU and memory tax)',
   })
   .option('noFirstRunSync', {
-    type: 'boolean',
+    // type: 'boolean',
     describe: "Don't do full sync on first run",
   })
   .option('debug', {
-    type: 'boolean',
+    // type: 'boolean',
     describe: 'Show debug information',
   })
   .version(false) // Set custom version option to avoid "[boolean]" flag in help
@@ -70,10 +80,18 @@ if (pckg) {
 
 
 const { argv } = yargs;
+
+let extensions;
+if (argv.extensions) {
+  extensions = (argv.extensions as string || '').split(',');
+}
+
 lib({
   command: argv._.join(' '),
-  watchdir: argv.watchdir as string,
-  polling: !argv.noFirstRunSync as boolean,
-  firstRunSync: argv.firstRunSync as boolean,
   debug: argv.debug as boolean,
+  delay: argv.delay as number,
+  extensions,
+  firstRunSync: argv.firstRunSync as boolean,
+  polling: !argv.noFirstRunSync as boolean,
+  watchdir: argv.watchdir as string,
 });
