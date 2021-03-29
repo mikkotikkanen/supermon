@@ -19,7 +19,6 @@ type modulesProps = {
   firstRunSync: boolean;
 }
 
-// let installEventBus: InstallEventBus;
 const cwd = '.';
 const packageJSONPath = join(cwd, 'package.json');
 const nodeModulesPath = join(cwd, 'node_modules');
@@ -48,12 +47,12 @@ const modules = ({
       .then(() => {
         if (storedPackageJSON) {
           const diffDependencies = dependencyDiff(
-            storedPackageJSON.dependencies,
-            packageJSON.dependencies,
+            storedPackageJSON.dependencies || {},
+            packageJSON.dependencies || {},
           );
           const diffDevDependencies = dependencyDiff(
-            storedPackageJSON.devDependencies,
-            packageJSON.devDependencies,
+            storedPackageJSON.devDependencies || {},
+            packageJSON.devDependencies || {},
           );
           // Combine dependency diffs
           missingDependencies = missingDependencies.concat(
@@ -129,10 +128,8 @@ const modules = ({
         }, 0);
       })
 
-      .catch((err) => {
-        eventBus.emit(LogEvents.Message, 'Error:', err);
-
-        throw new Error('Failed dependency sync.');
+      .catch(() => {
+        eventBus.emit(LogEvents.Message, 'Failed dependency sync.');
       });
   });
 };
