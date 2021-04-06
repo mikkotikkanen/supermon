@@ -33,9 +33,9 @@ export interface LibProps {
   delay?: number;
 
   /**
-   * Executable to dun the command with
+   * Executable to run the command with
    *
-   * Default: node
+   * Default: "node"
    */
   exec?: string;
 
