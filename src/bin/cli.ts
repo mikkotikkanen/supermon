@@ -90,7 +90,7 @@ if (pckg) {
 const { argv: args } = argv;
 
 let exec = args.exec || 'node';
-const command = args._.join(' ');
+let command = args._.join(' ');
 let ext = args.ext || ['js', 'mjs', 'jsx', 'json'];
 
 // Handle TypeScript commands
@@ -100,7 +100,8 @@ if (extname(command) === '.ts') {
 }
 // Handle NPM script as command
 if (command.match(/^npm /)) {
-  exec = ''; // Npm command includes executable (fe. "npm run dev")
+  exec = 'npm';
+  command = command.replace('npm ', '');
 }
 
 lib({
