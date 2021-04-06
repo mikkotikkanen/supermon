@@ -46,8 +46,8 @@ const logger = ({
    */
   eventBus.on(ProcessEvents.Start, ({
     command: executable,
-    watchdir,
-    extensions,
+    watch: watchdir,
+    ext: extensions,
   }: LibProps) => {
     const pckg = loadPackageJSON(join(__dirname, '..', '..', '..', 'package.json'));
     if (!pckg) {

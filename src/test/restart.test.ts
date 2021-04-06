@@ -27,11 +27,11 @@ test('Application should restart on file change', () => new Promise<void>((resol
 
   eventBus = lib({
     command: `${appFile} 1`,
-    watchdir: workDir,
+    watch: workDir,
     delay: 10,
     logging: false,
-    firstRunSync: false,
-    polling: true,
+    skipFirstSync: false,
+    legacywatch: true,
     // debug: true,
   });
 
