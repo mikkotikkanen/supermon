@@ -72,7 +72,7 @@ if (yargs.argv.help) {
   console.log('Note: Boolean options do not require value to be specified');
   console.log('');
   console.log('Note: All options can also be configured through environment variables with');
-  console.log('      "SUPERMON_" prefix. (fe. "SUPERMON_POLLING=true")');
+  console.log('      "SUPERMON_" prefix. (fe. "SUPERMON_LEGACYWATCH=true")');
   console.log('');
   console.log('Example use: "supermon app.js"');
   console.log('Example use: "supermon --watchdir=dist -- app.js --port=80"');
