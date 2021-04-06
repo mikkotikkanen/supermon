@@ -75,7 +75,7 @@ if (yargs.argv.help) {
   console.log('      "SUPERMON_" prefix. (fe. "SUPERMON_LEGACYWATCH=true")');
   console.log('');
   console.log('Example use: "supermon app.js"');
-  console.log('Example use: "supermon --watchdir=dist -- app.js --port=80"');
+  console.log('Example use: "supermon --watch=dist -- app.js --port=80"');
   process.exit(); /* eslint-disable-line no-process-exit */
 }
 
