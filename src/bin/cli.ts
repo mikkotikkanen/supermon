@@ -2,51 +2,60 @@
 
 import yargs from 'yargs';
 import { readFileSync } from 'fs';
-import { join } from 'path';
+import { join, extname } from 'path';
 import updateNotifier from 'update-notifier';
 import lib from '../lib/index';
 import loadPackageJSON from '../lib/modules/loadPackageJSON';
 
+
 const pckg = loadPackageJSON(join(__dirname, '..', '..', 'package.json'));
 
-yargs
+const argv = yargs
   .parserConfiguration({
-    'unknown-options-as-args': true, // Make sure to pass all unknown options to the executable
+    'unknown-options-as-args': true, // Make sure to pass all unknown options to the command
   })
   .env('SUPERMON')
-  .option('watchdir', {
-    // type: 'string',
-    describe: 'Which directory to watch for changes',
+  .option('watch', {
+    describe: 'Directory to watch for file changes',
     default: '.',
+    type: 'string',
   })
-  .option('extensions', {
-    // type: 'string',
+  .option('ext', {
     describe: 'Comma separated list of file extensions to watch',
+    type: 'string',
+    array: true,
   })
   .option('delay', {
-    // type: 'number',
     describe: 'How many ms to wait after file changes',
     default: 200,
+    type: 'number',
   })
-  .option('polling', {
-    // type: 'boolean',
-    describe: 'Use polling (CPU and memory tax)',
+  .option('exec', {
+    describe: 'Executable to run the command on',
+    // default: '(ts-)node',
+    type: 'string',
   })
-  .option('noFirstRunSync', {
-    // type: 'boolean',
+  .option('legacywatch', {
+    describe: 'Use polling instead of FS events',
+    type: 'boolean',
+  })
+  .option('skipfirstsync', {
     describe: "Don't do full sync on first run",
+    type: 'boolean',
   })
-  .option('debug', {
-    // type: 'boolean',
-    describe: 'Show debug information',
-  })
-  .version(false) // Set custom version option to avoid "[boolean]" flag in help
+  .version(true) // Set custom version option to avoid "[boolean]" flag in help
   .option('version', {
     describe: 'Show version number',
+    type: 'boolean',
   })
   .help(false) // Set custom help option to avoid "[boolean]" flag in help
   .option('help', {
     describe: 'Show help',
+    type: 'boolean',
+  })
+  .option('debug', {
+    describe: 'Show debug information',
+    type: 'boolean',
   });
 
 // Show help and version manually
@@ -61,7 +70,7 @@ if (yargs.argv.help) {
   console.log('');
   console.log('Note: If supermon arguments are provided, it is recommended to use "--" as separator between supermon and application');
   console.log('');
-  console.log('Note: [boolean] options do not require value to be specified');
+  console.log('Note: Boolean options do not require value to be specified');
   console.log('');
   console.log('Note: All options can also be configured through environment variables with');
   console.log('      "SUPERMON_" prefix. (fe. "SUPERMON_POLLING=true")');
@@ -79,19 +88,29 @@ if (pckg) {
 }
 
 
-const { argv } = yargs;
+const { argv: args } = argv;
 
-let extensions;
-if (argv.extensions) {
-  extensions = (argv.extensions as string || '').split(',');
+let exec = args.exec || 'node';
+const command = args._.join(' ');
+let ext = args.ext || ['js', 'mjs', 'jsx', 'json'];
+
+// Handle TypeScript commands
+if (extname(command) === '.ts') {
+  exec = 'ts-node';
+  ext = ext || ['ts', 'tsx', 'json'];
+}
+// Handle NPM script as command
+if (command.match(/^npm /)) {
+  exec = ''; // Npm command includes executable (fe. "npm run dev")
 }
 
 lib({
-  command: argv._.join(' '),
-  debug: argv.debug as boolean,
-  delay: argv.delay as number,
-  extensions,
-  firstRunSync: argv.firstRunSync as boolean,
-  polling: !argv.noFirstRunSync as boolean,
-  watchdir: argv.watchdir as string,
+  debug: args.debug,
+  delay: args.delay,
+  command,
+  ext,
+  exec,
+  legacywatch: args.legacywatch,
+  skipFirstSync: !args.skipfirstsync,
+  watch: args.watch,
 });

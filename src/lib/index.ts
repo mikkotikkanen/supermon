@@ -1,4 +1,3 @@
-import { extname } from 'path';
 import treeKill from 'tree-kill';
 import { existsSync } from 'fs';
 import modules from './modules';
@@ -34,16 +33,23 @@ export interface LibProps {
   delay?: number;
 
   /**
+   * Executable to dun the command with
+   *
+   * Default: node
+   */
+  exec?: string;
+
+  /**
    * File extensions to watch
    */
-  extensions?: string[];
+  ext?: string[];
 
   /**
    * Wheter or not to do full sync on first run
    *
-   * Default: true
+   * Default: false
    */
-  firstRunSync?: boolean;
+  skipFirstSync?: boolean;
 
   /**
    * Log things to console
@@ -55,12 +61,12 @@ export interface LibProps {
    *
    * Useful for fe. running on Docker container where FS events arent propagated to host
    */
-  polling?: boolean;
+  legacywatch?: boolean;
 
   /**
    * Directory to watch file events for
    */
-  watchdir?: string;
+  watch?: string;
 }
 
 
@@ -75,24 +81,13 @@ export default ({
   command,
   debug = false,
   delay = 200,
-  extensions,
-  firstRunSync = true,
+  exec = 'node',
+  ext,
+  skipFirstSync = true,
   logging = true,
-  polling = false,
-  watchdir = '.',
+  legacywatch = false,
+  watch: watchdir = '.',
 }: LibProps): EventBus => {
-  // Default to node
-  let executable = 'node';
-  let resolvedExtensions = extensions || ['js', 'mjs', 'jsx', 'json'];
-  if (command.match(/^npm /)) {
-    // NPM script
-    executable = ''; // Command includes executable
-  } else if (extname(command) === '.ts') {
-    // TypeScript
-    executable = 'ts-node';
-    resolvedExtensions = extensions || ['ts', 'tsx', 'json'];
-  }
-
   const eventBus = new EventBus({
     debug,
   });
@@ -109,8 +104,8 @@ export default ({
 
   const props: LibProps = {
     command,
-    watchdir,
-    extensions: resolvedExtensions,
+    watch: watchdir,
+    ext,
   };
   eventBus.emit(ProcessEvents.Start, props);
 
@@ -118,8 +113,8 @@ export default ({
   watch({
     eventBus,
     cwd: watchdir,
-    polling,
-    extensions: resolvedExtensions,
+    polling: legacywatch,
+    extensions: ext,
     delay,
   });
   eventBus.on(WatchEvents.FilesChanged, () => {
@@ -130,10 +125,10 @@ export default ({
   });
 
 
-  // Setup installer
+  // Setup module handler
   modules({
     eventBus,
-    firstRunSync,
+    firstRunSync: !skipFirstSync,
   });
   eventBus.on(ModulesEvents.Install, () => {
     eventBus.emit(WatchEvents.Disable);
@@ -154,8 +149,7 @@ export default ({
   // Setup the requested command
   runRestartable({
     eventBus,
-    // If no executable is defined, just run command
-    command: (executable === '' ? `${command}` : `${executable} ${command}`),
+    command: `${exec} ${command}`,
   });
 
   eventBus.on(ChildEvents.Started, () => {
