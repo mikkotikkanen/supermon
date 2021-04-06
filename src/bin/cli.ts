@@ -67,7 +67,7 @@ if (yargs.argv.version) {
 if (yargs.argv.help) {
   yargs.showHelp('log');
   console.log('');
-  console.log('Note: If supermon arguments are provided, it is recommended to use "--" as separator between supermon and application');
+  console.log('Note: If supermon arguments are provided, it is recommended to use "--" as separator between supermon and application command');
   console.log('');
   console.log('Note: Boolean options do not require value to be specified');
   console.log('');
