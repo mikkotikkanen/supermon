@@ -32,7 +32,6 @@ const argv = yargs
   })
   .option('exec', {
     describe: 'Executable to run the command on',
-    // default: '(ts-)node',
     type: 'string',
   })
   .option('legacywatch', {
