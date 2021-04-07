@@ -85,7 +85,7 @@ export default ({
   delay = 200,
   exec = 'node',
   ext = ['js', 'mjs', 'jsx', 'json'],
-  skipFirstSync = true,
+  skipFirstSync = false,
   logging = true,
   legacywatch = false,
   watch: watchdir = '.',

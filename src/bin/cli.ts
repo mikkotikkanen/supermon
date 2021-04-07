@@ -111,6 +111,6 @@ lib({
   ext,
   exec,
   legacywatch: args.legacywatch,
-  skipFirstSync: !args.skipfirstsync,
+  skipFirstSync: args.skipfirstsync,
   watch: args.watch,
 });

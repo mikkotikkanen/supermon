@@ -30,7 +30,7 @@ test('Application should restart on file change', () => new Promise<void>((resol
     watch: workDir,
     delay: 10,
     logging: false,
-    skipFirstSync: false,
+    skipFirstSync: true,
     legacywatch: true,
     // debug: true,
   });
