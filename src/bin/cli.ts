@@ -2,41 +2,59 @@
 
 import yargs from 'yargs';
 import { readFileSync } from 'fs';
-import { join } from 'path';
+import { join, extname } from 'path';
 import updateNotifier from 'update-notifier';
 import lib from '../lib/index';
 import loadPackageJSON from '../lib/modules/loadPackageJSON';
 
+
 const pckg = loadPackageJSON(join(__dirname, '..', '..', 'package.json'));
 
-yargs
+const argv = yargs
   .parserConfiguration({
-    'unknown-options-as-args': true, // Make sure to pass all unknown options to the executable
+    'unknown-options-as-args': true, // Make sure to pass all unknown options to the command
   })
   .env('SUPERMON')
-  .option('watchdir', {
+  .option('watch', {
+    describe: 'Directory to watch for file changes',
+    default: '.',
     type: 'string',
-    describe: 'Which directory to watch for changes',
   })
-  .option('polling', {
-    type: 'boolean',
-    describe: 'Use polling (CPU and memory tax)',
+  .option('ext', {
+    describe: 'Comma separated list of file extensions to watch',
+    type: 'string',
+    array: true,
   })
-  .option('noFirstRunSync', {
+  .option('delay', {
+    describe: 'How many ms to wait after file changes',
+    default: 200,
+    type: 'number',
+  })
+  .option('exec', {
+    describe: 'Executable to run the command on',
+    type: 'string',
+  })
+  .option('legacywatch', {
+    describe: 'Use polling instead of FS events',
     type: 'boolean',
+  })
+  .option('skipfirstsync', {
     describe: "Don't do full sync on first run",
-  })
-  .option('debug', {
     type: 'boolean',
-    describe: 'Show debug information',
   })
-  .version(false) // Set custom version option to avoid "[boolean]" flag in help
+  .version(true) // Set custom version option to avoid "[boolean]" flag in help
   .option('version', {
     describe: 'Show version number',
+    type: 'boolean',
   })
   .help(false) // Set custom help option to avoid "[boolean]" flag in help
   .option('help', {
     describe: 'Show help',
+    type: 'boolean',
+  })
+  .option('debug', {
+    describe: 'Show debug information',
+    type: 'boolean',
   });
 
 // Show help and version manually
@@ -49,15 +67,15 @@ if (yargs.argv.version) {
 if (yargs.argv.help) {
   yargs.showHelp('log');
   console.log('');
-  console.log('Note: If supermon arguments are provided, it is recommended to use "--" as separator between supermon and application');
+  console.log('Note: If supermon arguments are provided, it is recommended to use "--" as separator between supermon and application command');
   console.log('');
-  console.log('Note: [boolean] options do not require value to be specified');
+  console.log('Note: Boolean options do not require value to be specified');
   console.log('');
   console.log('Note: All options can also be configured through environment variables with');
-  console.log('      "SUPERMON_" prefix. (fe. "SUPERMON_POLLING=true")');
+  console.log('      "SUPERMON_" prefix. (fe. "SUPERMON_LEGACYWATCH=true")');
   console.log('');
   console.log('Example use: "supermon app.js"');
-  console.log('Example use: "supermon --watchdir=dist -- app.js --port=80"');
+  console.log('Example use: "supermon --watch=dist -- app.js --port=80"');
   process.exit(); /* eslint-disable-line no-process-exit */
 }
 
@@ -69,11 +87,30 @@ if (pckg) {
 }
 
 
-const { argv } = yargs;
+const { argv: args } = argv;
+
+let exec = args.exec || 'node';
+let command = args._.join(' ');
+let ext = args.ext || ['js', 'mjs', 'jsx', 'json'];
+
+// Handle TypeScript commands
+if (extname(command) === '.ts') {
+  exec = 'ts-node';
+  ext = ext || ['ts', 'tsx', 'json'];
+}
+// Handle NPM script as command
+if (command.match(/^npm /)) {
+  exec = 'npm';
+  command = command.replace('npm ', '');
+}
+
 lib({
-  command: argv._.join(' '),
-  watchdir: argv.watchdir as string,
-  polling: !argv.noFirstRunSync as boolean,
-  firstRunSync: argv.firstRunSync as boolean,
-  debug: argv.debug as boolean,
+  debug: args.debug,
+  delay: args.delay,
+  command,
+  ext,
+  exec,
+  legacywatch: args.legacywatch,
+  skipFirstSync: args.skipfirstsync,
+  watch: args.watch,
 });

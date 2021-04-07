@@ -45,9 +45,12 @@ const logger = ({
    * Process events
    */
   eventBus.on(ProcessEvents.Start, ({
-    command: executable,
-    watchdir,
-    extensions,
+    command,
+    exec,
+    ext,
+    delay,
+    legacywatch,
+    watch,
   }: LibProps) => {
     const pckg = loadPackageJSON(join(__dirname, '..', '..', '..', 'package.json'));
     if (!pckg) {
@@ -56,9 +59,13 @@ const logger = ({
 
     log();
     log(`v${pckg.version}`);
-    log(`Child process: ${executable}`);
-    log(`Watching directory: ${watchdir}`);
-    log(`Watching extensions: ${extensions?.join(',')}`);
+    log(`Child process: ${exec} ${command}`);
+    log(`Watching directory: ${watch}`);
+    log(`Watching extensions: ${ext?.join(',')}`);
+    log(`Watch delay: ${delay}ms`);
+    if (legacywatch) {
+      log('Using legacywatch');
+    }
     log();
   });
 
