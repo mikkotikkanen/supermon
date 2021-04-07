@@ -104,8 +104,11 @@ export default ({
 
   const props: LibProps = {
     command,
-    watch: watchdir,
+    delay,
+    exec,
     ext,
+    legacywatch,
+    watch: watchdir,
   };
   eventBus.emit(ProcessEvents.Start, props);
 
