@@ -42,21 +42,25 @@ supermon npm run server
 
 ```help
 Options:
-  --watchdir        Which directory to watch for changes                [string]
-  --polling         Use polling (CPU and memory tax)                   [boolean]
-  --noFirstRunSync  Don't do full sync on first run                    [boolean]
-  --version         Show version number
-  --help            Show help
+  --watch          Directory to watch for file changes   [string] [default: "."]
+  --ext            Comma separated list of file extensions to watch      [array]
+  --delay          How many ms to wait after file changes[number] [default: 200]
+  --exec           Executable to run the command on                     [string]
+  --legacywatch    Use polling instead of FS events                    [boolean]
+  --skipfirstsync  Don't do full sync on first run                     [boolean]
+  --version        Show version number                                 [boolean]
+  --help           Show help                                           [boolean]
+  --debug          Show debug information                              [boolean]
 
-Note: If supermon arguments are provided, it is recommended to use "--" as separator between supermon and application
+Note: If supermon arguments are provided, it is recommended to use "--" as separator between supermon and application command
 
-Note: [boolean] options do not require value to be specified
+Note: Boolean options do not require value to be specified
 
 Note: All options can also be configured through environment variables with
-      "SUPERMON_" prefix. (fe. "SUPERMON_POLLING=true")
+      "SUPERMON_" prefix. (fe. "SUPERMON_LEGACYWATCH=true")
 
 Example use: "supermon app.js"
-Example use: "supermon --watchdir=dist -- app.js --port=80"
+Example use: "supermon --watch=dist -- app.js --port=80"
 ```
 
 ## Contributing
