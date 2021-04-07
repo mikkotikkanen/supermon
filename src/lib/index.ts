@@ -76,13 +76,15 @@ let isBeingKilled = false;
 
 /**
  * Setup main process
+ *
+ * Set sensible defaults
  */
 export default ({
   command,
   debug = false,
   delay = 200,
   exec = 'node',
-  ext,
+  ext = ['js', 'mjs', 'jsx', 'json'],
   skipFirstSync = true,
   logging = true,
   legacywatch = false,
