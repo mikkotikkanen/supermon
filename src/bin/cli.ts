@@ -38,6 +38,11 @@ const argv = yargs
     describe: 'Use polling instead of FS events',
     type: 'boolean',
   })
+  .option('pm', {
+    describe: "Package manager to use (fe. 'npm')",
+    default: 'npm',
+    type: 'string',
+  })
   .option('skipfirstsync', {
     describe: "Don't do full sync on first run",
     type: 'boolean',
@@ -110,6 +115,7 @@ lib({
   command,
   ext,
   exec,
+  packageManager: args.pm,
   legacywatch: args.legacywatch,
   skipFirstSync: args.skipfirstsync,
   watch: args.watch,
