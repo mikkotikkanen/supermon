@@ -45,11 +45,11 @@ export interface LibProps {
   ext?: string[];
 
   /**
-   * Wheter or not to do full sync on first run
+   * Use polling instead of file system events
    *
-   * Default: false
+   * Useful for fe. running on Docker container where FS events arent propagated to host
    */
-  skipFirstSync?: boolean;
+  legacywatch?: boolean;
 
   /**
    * Log things to console
@@ -57,11 +57,16 @@ export interface LibProps {
   logging?: boolean;
 
   /**
-   * Use polling instead of file system events
+   * Wheter or not to do full sync on first run
    *
-   * Useful for fe. running on Docker container where FS events arent propagated to host
+   * Default: false
    */
-  legacywatch?: boolean;
+  skipFirstSync?: boolean;
+
+  /**
+   * Package manager (fe. "npm", "yarn", "pnpm")
+   */
+  packageManager?: string;
 
   /**
    * Directory to watch file events for
@@ -85,9 +90,10 @@ export default ({
   delay = 200,
   exec = 'node',
   ext = ['js', 'mjs', 'jsx', 'json'],
-  skipFirstSync = false,
-  logging = true,
   legacywatch = false,
+  logging = true,
+  skipFirstSync = false,
+  packageManager = 'npm',
   watch: watchdir = '.',
 }: LibProps): EventBus => {
   const eventBus = new EventBus({
@@ -134,6 +140,7 @@ export default ({
   modules({
     eventBus,
     firstRunSync: !skipFirstSync,
+    packageManager,
   });
   eventBus.on(ModulesEvents.Install, () => {
     eventBus.emit(WatchEvents.Disable);
