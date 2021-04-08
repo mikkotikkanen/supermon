@@ -17,6 +17,11 @@ type modulesProps = {
    * Wheter or not do to the first run full sync
    */
   firstRunSync: boolean;
+
+  /**
+   * Package manager (fe. "npm", "yarn", "pnpm")
+   */
+  packageManager?: string;
 }
 
 const cwd = '.';
@@ -26,6 +31,7 @@ const nodeModulesPath = join(cwd, 'node_modules');
 
 const modules = ({
   eventBus,
+  packageManager = 'npm',
   firstRunSync = true,
 }: modulesProps): void => {
   eventBus.on(ModulesEvents.Install, () => {
@@ -98,17 +104,17 @@ const modules = ({
           // No previously stored dependencies
           if (firstRunSync) {
             eventBus.emit(LogEvents.Message, 'First execution. Running full sync (install & prune)...');
-            await runOnce('npm install --no-audit');
-            await runOnce('npm prune');
+            await runOnce(`${packageManager} install --no-audit`);
+            await runOnce(`${packageManager} prune`);
           }
         } else if (storedPackageJSON && (missingDependencies.length || extraDependencies.length)) {
           eventBus.emit(LogEvents.Message, 'Syncinc dependencies...');
           // Previously stored dependencies with changes
           if (missingDependencies.length) {
-            await runOnce(`npm install ${missingDependencies.map((module) => `${module.name}@${module.version}`).join(' ')} --no-audit`);
+            await runOnce(`${packageManager} install ${missingDependencies.map((module) => `${module.name}@${module.version}`).join(' ')} --no-audit`);
           }
           if (extraDependencies.length) {
-            await runOnce(`npm uninstall ${extraDependencies.map((module) => `${module.name}@${module.version}`).join(' ')}`);
+            await runOnce(`${packageManager} uninstall ${extraDependencies.map((module) => `${module.name}@${module.version}`).join(' ')}`);
           }
         }
 
