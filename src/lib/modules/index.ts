@@ -102,7 +102,7 @@ const modules = ({
             await runOnce('npm prune');
           }
         } else if (storedPackageJSON && (missingDependencies.length || extraDependencies.length)) {
-          eventBus.emit(LogEvents.Message, 'Syncinc dependencies...');
+          eventBus.emit(LogEvents.Message, 'Syncing dependencies...');
           // Previously stored dependencies with changes
           if (missingDependencies.length) {
             await runOnce(`npm install ${missingDependencies.map((module) => `${module.name}@${module.version}`).join(' ')} --no-audit`);
