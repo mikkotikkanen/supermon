@@ -27,14 +27,14 @@ export type WatchProps = {
    *
    * Default: ['js', 'mjs', 'json']
    */
-  extensions?: Array<string>;
+  extensions?: string[];
 
   /**
    * Which paths to ignore
    *
-   * Default: ['./node_modules', './docs']
+   * Default: ['./node_modules', './docs', './git']
    */
-  ignore?: Array<string>;
+  ignore?: string[];
 
   /**
    * How long to sleep (in ms) when file change event is detected
@@ -55,16 +55,18 @@ const watch = ({
   cwd = '.',
   polling = false,
   extensions = ['js', 'mjs', 'json'],
-  ignore = ['./node_modules', './docs'],
+  ignore = [],
   delay = 200,
 }: WatchProps): void => {
   let debounceTimer: NodeJS.Timeout;
+  const defaultIgnore = ['./node_modules', './docs', './git'];
 
   // Watch for file changes
   const watchPatterns = (extensions || []).map((ext) => `**/*.${ext}`);
+  const ignorePatterns = [...ignore, ...defaultIgnore];
   watcher = chokidar(watchPatterns, {
     cwd,
-    ignored: (ignore || []),
+    ignored: ignorePatterns,
     usePolling: polling,
   });
 
