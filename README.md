@@ -43,6 +43,7 @@ supermon npm run server
 ```help
 Options:
   --watch          Directory to watch for file changes   [string] [default: "."]
+  --ignore         Directories to ignore for file changes                [array]
   --ext            Comma separated list of file extensions to watch      [array]
   --delay          How many ms to wait after file changes[number] [default: 200]
   --exec           Executable to run the command on                     [string]
