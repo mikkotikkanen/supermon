@@ -20,6 +20,11 @@ const argv = yargs
     default: '.',
     type: 'string',
   })
+  .option('ignore', {
+    describe: 'Directories to ignore for file changes',
+    type: 'string',
+    array: true,
+  })
   .option('ext', {
     describe: 'Comma separated list of file extensions to watch',
     type: 'string',
@@ -110,6 +115,7 @@ lib({
   command,
   ext,
   exec,
+  ignore: args.ignore,
   legacywatch: args.legacywatch,
   skipFirstSync: args.skipfirstsync,
   watch: args.watch,
