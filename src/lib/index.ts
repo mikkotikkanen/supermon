@@ -45,11 +45,9 @@ export interface LibProps {
   ext?: string[];
 
   /**
-   * Wheter or not to do full sync on first run
-   *
-   * Default: false
+   * Which file paths to ignore
    */
-  skipFirstSync?: boolean;
+  ignore?: string[];
 
   /**
    * Log things to console
@@ -62,6 +60,13 @@ export interface LibProps {
    * Useful for fe. running on Docker container where FS events arent propagated to host
    */
   legacywatch?: boolean;
+
+  /**
+   * Wheter or not to do full sync on first run
+   *
+   * Default: false
+   */
+  skipFirstSync?: boolean;
 
   /**
    * Directory to watch file events for
@@ -89,6 +94,7 @@ export default ({
   logging = true,
   legacywatch = false,
   watch: watchdir = '.',
+  ignore = [],
 }: LibProps): EventBus => {
   const eventBus = new EventBus({
     debug,
@@ -118,9 +124,10 @@ export default ({
   watch({
     eventBus,
     cwd: watchdir,
-    polling: legacywatch,
     extensions: ext,
     delay,
+    ignore,
+    polling: legacywatch,
   });
   eventBus.on(WatchEvents.FilesChanged, () => {
     // Only start emitting watch events once the child process is running
