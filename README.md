@@ -1,7 +1,7 @@
 # supermon
 
 <p align="center">
-  <img width="643" height="377" src="https://raw.githubusercontent.com/mikkotikkanen/supermon/master/screenshot.png">
+  <img width="1432" src="https://raw.githubusercontent.com/mikkotikkanen/supermon/master/screenshot.png">
 </p>
 
 ![alt](https://github.com/mikkotikkanen/supermon/workflows/CI/badge.svg)
