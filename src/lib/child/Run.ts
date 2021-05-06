@@ -120,11 +120,32 @@ export class Run {
       // Set last piece as new buffer
       stdoutBuffer = lines.shift() as string;
     });
-
-    // When stdout ends, log out remaining buffer
     child.stdout.on('end', () => {
+      // When stdout ends, log out remaining buffer
       if (stdoutBuffer) {
         this.log(stdoutBuffer);
+      }
+    });
+
+    // Log out stderr data as lines
+    let stderrBuffer = '';
+    child.stderr.on('data', (chunk) => {
+      stderrBuffer += chunk;
+
+      // Log completed lines out
+      const lines = stderrBuffer.split('\n');
+      while (lines.length > 1) {
+        const line = lines.shift() as string;
+        this.log(line);
+      }
+
+      // Set last piece as new buffer
+      stderrBuffer = lines.shift() as string;
+    });
+    child.stderr.on('end', () => {
+      // When stdout ends, log out remaining buffer
+      if (stderrBuffer) {
+        this.log(stderrBuffer);
       }
     });
 
