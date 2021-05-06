@@ -1,7 +1,7 @@
 import EventBus, { ChildEvents } from '../EventBus';
 import { Run } from './Run';
 
-type runRestartableProps = {
+type childProcessProps = {
   /**
    * Event bus
    */
@@ -19,7 +19,7 @@ let isRestarting = false;
 export default ({
   eventBus,
   command,
-}: runRestartableProps): void => {
+}: childProcessProps): void => {
   const run = new Run({ command });
 
   run.eventBus.on(run.Events.Started, () => {
