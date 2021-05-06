@@ -17,7 +17,8 @@
     "monitor",
     "restart",
     "development",
-    "typescript"
+    "typescript",
+    "docker"
   ],
   "author": {
     "name": "Mikko Tikkanen",
@@ -55,7 +56,7 @@
   },
   "scripts": {
     "dev": "tsc --watch",
-    "dev-test-server": "ts-node ./src/bin/cli.ts ./dist/test/apps/test-server.js --debug",
+    "dev-test-server": "ts-node ./src/bin/cli.ts ./dist/test/apps/test-server.js",
     "dev-test-lib": "ts-node ./src/bin/cli.ts",
     "dev-test-help": "ts-node ./src/bin/cli.ts --help",
     "dev-test-version": "ts-node ./src/bin/cli.ts --version",
