@@ -123,7 +123,9 @@ export class Run {
 
     // When stdout ends, log out remaining buffer
     child.stdout.on('end', () => {
-      this.log(stdoutBuffer);
+      if (stdoutBuffer) {
+        this.log(stdoutBuffer);
+      }
     });
 
     // When child exists, send corresponding event to eventbus
