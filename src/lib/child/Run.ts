@@ -15,6 +15,11 @@ export interface RunProps {
   cwd?: string;
 
   /**
+   * Send logs to the logger instead of plain console.log
+   */
+  useLogger?: boolean;
+
+  /**
    * Should the process be started automatically
    */
   autostart?: boolean;
@@ -30,6 +35,7 @@ export enum Events {
   Started = 'RUN_STARTED',
   Stop = 'RUN_STOP',
   Stopped = 'RUN_STOPPED',
+  Log = 'RUN_LOG',
 }
 
 
@@ -37,6 +43,8 @@ export class Run {
   private command: string;
 
   private cwd?: string;
+
+  private useLogger: boolean;
 
   private pid = 0;
 
@@ -47,11 +55,13 @@ export class Run {
   constructor({
     command,
     cwd,
+    useLogger = false,
     autostart = true,
     debug = false,
   }: RunProps) {
     this.command = command;
     this.cwd = cwd;
+    this.useLogger = useLogger;
     this.eventBus = new EventBus({
       debug,
     });
@@ -78,15 +88,45 @@ export class Run {
     return this.pid !== 0;
   }
 
+  log(message: string): void {
+    if (this.useLogger) {
+      this.eventBus.emit(this.Events.Log, message);
+    } else {
+      console.log(message);
+    }
+  }
+
   start(): void {
     // Start child process
     const child = spawn(this.command, { // child event handlers are left behind after restart
       cwd: this.cwd,
       shell: true,
-      stdio: 'inherit',
+      stdio: 'pipe',
     });
     this.pid = child.pid;
 
+    // Log out stdout data as lines
+    let stdoutBuffer = '';
+    child.stdout.on('data', (chunk) => {
+      stdoutBuffer += chunk;
+
+      // Log completed lines out
+      const lines = stdoutBuffer.split('\n');
+      while (lines.length > 1) {
+        const line = lines.shift() as string;
+        this.log(line);
+      }
+
+      // Set last piece as new buffer
+      stdoutBuffer = lines.shift() as string;
+    });
+
+    // When stdout ends, log out remaining buffer
+    child.stdout.on('end', () => {
+      this.log(stdoutBuffer);
+    });
+
+    // When child exists, send corresponding event to eventbus
     child.on('close', (code: number) => {
       if (this.pid) {
         this.pid = 0;
@@ -94,6 +134,7 @@ export class Run {
       }
     });
 
+    // Notify eventbus that child has started when everything is set
     this.eventBus.emit(this.Events.Started);
   }
 }
