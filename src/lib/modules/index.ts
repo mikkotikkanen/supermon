@@ -1,7 +1,7 @@
 import { join } from 'path';
 import { existsSync } from 'fs';
 import { satisfies } from 'semver';
-import { runOnce } from '../child';
+import { childTask } from '../child';
 import dependencyDiff, { Diff } from './dependencyDiff';
 import LoadPackageJSON from './loadPackageJSON';
 import { set, get } from './store';
@@ -98,17 +98,29 @@ const modules = ({
           // No previously stored dependencies
           if (firstRunSync) {
             eventBus.emit(LogEvents.Message, 'First execution. Running full sync (install & prune)...');
-            await runOnce('npm install --no-audit');
-            await runOnce('npm prune');
+            await childTask({
+              eventBus,
+              command: 'npm install --no-audit',
+            });
+            await childTask({
+              eventBus,
+              command: 'npm prune',
+            });
           }
         } else if (storedPackageJSON && (missingDependencies.length || extraDependencies.length)) {
           eventBus.emit(LogEvents.Message, 'Syncing dependencies...');
           // Previously stored dependencies with changes
           if (missingDependencies.length) {
-            await runOnce(`npm install ${missingDependencies.map((module) => `${module.name}@${module.version}`).join(' ')} --no-audit`);
+            await childTask({
+              eventBus,
+              command: `npm install ${missingDependencies.map((module) => `${module.name}@${module.version}`).join(' ')} --no-audit`,
+            });
           }
           if (extraDependencies.length) {
-            await runOnce(`npm uninstall ${extraDependencies.map((module) => `${module.name}@${module.version}`).join(' ')}`);
+            await childTask({
+              eventBus,
+              command: `npm uninstall ${extraDependencies.map((module) => `${module.name}@${module.version}`).join(' ')}`,
+            });
           }
         }
 

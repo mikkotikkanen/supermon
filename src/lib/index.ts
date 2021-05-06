@@ -2,7 +2,7 @@ import treeKill from 'tree-kill';
 import { existsSync } from 'fs';
 import modules from './modules';
 import watch from './watch';
-import { runRestartable } from './child';
+import { childProcess } from './child';
 import logger from './logger';
 import EventBus, {
   ChildEvents,
@@ -159,7 +159,7 @@ export default ({
 
 
   // Setup the requested command
-  runRestartable({
+  childProcess({
     eventBus,
     command: `${exec} ${command}`,
   });
