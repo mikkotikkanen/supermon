@@ -1,4 +1,5 @@
 import EventEmitter from 'events';
+import logger from '../logger/logger';
 
 export type EventBusProps = {
   /**
@@ -9,10 +10,6 @@ export type EventBusProps = {
 
 export enum ProcessEvents {
   Start = 'PROCESS_START',
-}
-
-export enum LogEvents {
-  Message = 'LOG_MESSAGE',
 }
 
 export enum ChildEvents {
@@ -53,7 +50,7 @@ export default class EventBus extends EventEmitter {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   emit(event: string, ...args: any[]): boolean {
     if (this.debug) {
-      super.emit(LogEvents.Message, `Eventbus event emit. "${event}"`);
+      logger.prefix(`Eventbus event emit. "${event}"`);
     }
 
     return super.emit(event, ...args);

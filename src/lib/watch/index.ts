@@ -1,5 +1,6 @@
 import { watch as chokidar, FSWatcher } from 'chokidar';
 import EventBus, { WatchEvents } from '../EventBus';
+import logger from '../logger/logger';
 
 
 export type WatchProps = {
@@ -76,6 +77,9 @@ const watch = ({
       // Debounce repeating events
       clearTimeout(debounceTimer);
       debounceTimer = setTimeout(() => {
+        logger.prefix();
+        logger.prefix('File change(s) detected. Restarting child process...');
+        logger.prefix();
         eventBus.emit(WatchEvents.FilesChanged);
       }, delay);
     }

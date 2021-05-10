@@ -1,6 +1,7 @@
 import { spawn } from 'child_process';
 import kill from 'tree-kill';
 import EventBus from '../EventBus';
+import logger from '../logger/logger';
 
 
 export interface RunProps {
@@ -90,9 +91,9 @@ export class Run {
 
   log(message: string): void {
     if (this.useLogger) {
-      this.eventBus.emit(this.Events.Log, message);
+      logger.prefix(message);
     } else {
-      console.log(message);
+      logger.log(message);
     }
   }
 

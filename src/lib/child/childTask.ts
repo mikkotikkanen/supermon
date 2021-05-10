@@ -1,22 +1,7 @@
-import EventBus, { LogEvents } from '../EventBus';
+import logger from '../logger/logger';
 import { Run } from './Run';
 
-type childTaskProps = {
-  /**
-   * Event bus
-   */
-  eventBus: EventBus;
-
-  /**
-   * Command
-   */
-  command: string;
-}
-
-export default ({
-  eventBus,
-  command,
-}: childTaskProps): Promise<void> => new Promise((resolve, reject) => {
+export default (command: string): Promise<void> => new Promise((resolve, reject) => {
   const run = new Run({
     command,
     useLogger: true,
@@ -31,7 +16,7 @@ export default ({
   });
 
   run.eventBus.on(run.Events.Log, (message) => {
-    eventBus.emit(LogEvents.Message, message);
+    logger.log(message);
   });
 
   run.start();
