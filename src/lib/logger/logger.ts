@@ -9,8 +9,7 @@ let isEnabled = true;
  * @param message Message to log
  * @param args Rest of the arguments given to the function
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const logFnc = (hasPrefix?: boolean, message?: string, ...args: any[]) => {
+const logFnc = (hasPrefix?: boolean, message?: string) => {
   if (isEnabled) {
     const logPrefix = (hasPrefix ? `[${grey('supermon')}] ` : '');
     if (message) {
@@ -28,14 +27,12 @@ const enabled = (newIsEnabled: boolean): void => {
   isEnabled = newIsEnabled;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const prefix = (message?: string, ...args: any[]): void => {
-  logFnc(true, message, args);
+const prefix = (message?: string): void => {
+  logFnc(true, message);
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const log = (message?: string, ...args: any[]): void => {
-  logFnc(false, message, args);
+const log = (message?: string): void => {
+  logFnc(false, message);
 };
 
 export default {
