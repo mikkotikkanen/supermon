@@ -106,49 +106,14 @@ export class Run {
     });
     this.pid = child.pid;
 
-    // Log out stdout data as lines
-    let stdoutBuffer = '';
-    child.stdout.on('data', (chunk) => {
-      stdoutBuffer += chunk;
-
-      // Log completed lines out
-      const lines = stdoutBuffer.split('\n');
-      while (lines.length > 1) {
-        const line = lines.shift() as string;
-        this.log(line);
-      }
-
-      // Set last piece as new buffer
-      stdoutBuffer = lines.shift() as string;
-    });
-    child.stdout.on('end', () => {
-      // When stdout ends, log out remaining buffer
-      if (stdoutBuffer) {
-        this.log(stdoutBuffer);
-      }
-    });
-
-    // Log out stderr data as lines
-    let stderrBuffer = '';
-    child.stderr.on('data', (chunk) => {
-      stderrBuffer += chunk;
-
-      // Log completed lines out
-      const lines = stderrBuffer.split('\n');
-      while (lines.length > 1) {
-        const line = lines.shift() as string;
-        this.log(line);
-      }
-
-      // Set last piece as new buffer
-      stderrBuffer = lines.shift() as string;
-    });
-    child.stderr.on('end', () => {
-      // When stdout ends, log out remaining buffer
-      if (stderrBuffer) {
-        this.log(stderrBuffer);
-      }
-    });
+    // Log events to console.log
+    if (this.useLogger) {
+      logger.prefixStream(child.stdout);
+      logger.prefixStream(child.stderr);
+    } else {
+      logger.logStream(child.stdout);
+      logger.logStream(child.stderr);
+    }
 
     // When child exists, send corresponding event to eventbus
     child.on('close', (code: number) => {
