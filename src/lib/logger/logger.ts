@@ -4,11 +4,10 @@ import { Stream } from 'stream';
 let isEnabled = true;
 
 /**
- * Log message with "supermon" prefix
+ * Log message
  *
- * @param hasPrefix Has line prefix
- * @param message Message to log
- * @param args Rest of the arguments given to the function
+ * @param hasPrefix Does the message have prefix
+ * @param message Log message
  */
 const logFnc = (hasPrefix?: boolean, message?: string) => {
   if (isEnabled) {
@@ -21,6 +20,12 @@ const logFnc = (hasPrefix?: boolean, message?: string) => {
   }
 };
 
+/**
+ * Log lines from stream
+ *
+ * @param hasPrefix Do lines have prefix
+ * @param stream Log stream
+ */
 const streamFnc = (hasPrefix: boolean, stream: Stream) => {
   let buffer = '';
   stream.on('data', (chunk) => {
@@ -47,23 +52,45 @@ const streamFnc = (hasPrefix: boolean, stream: Stream) => {
 
 /**
  * Enable/disable logging
+ *
+ * @param newIsEnabled Enabled
  */
 const enabled = (newIsEnabled: boolean): void => {
   isEnabled = newIsEnabled;
 };
 
+/**
+ * Log message with prefix
+ *
+ * @param message Log message
+ */
 const prefix = (message?: string): void => {
   logFnc(true, message);
 };
 
+/**
+ * Log lines from log stream with prefix
+ *
+ * @param stream Log stream
+ */
 const prefixStream = (stream: Stream): void => {
   streamFnc(true, stream);
 };
 
+/**
+ * Log message
+ *
+ * @param message Log message
+ */
 const log = (message?: string): void => {
   logFnc(false, message);
 };
 
+/**
+ * Log lines from log stream
+ *
+ * @param stream Log stream
+ */
 const logStream = (stream: Stream): void => {
   streamFnc(false, stream);
 };
