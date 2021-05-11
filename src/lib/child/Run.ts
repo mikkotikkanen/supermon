@@ -16,9 +16,9 @@ export interface RunProps {
   cwd?: string;
 
   /**
-   * Send logs to the logger instead of plain console.log
+   * Whether to prefix logs or not
    */
-  useLogger?: boolean;
+  prefixLogs?: boolean;
 
   /**
    * Should the process be started automatically
@@ -45,7 +45,7 @@ export class Run {
 
   private cwd?: string;
 
-  private useLogger: boolean;
+  private prefixLogs: boolean;
 
   private pid = 0;
 
@@ -56,13 +56,13 @@ export class Run {
   constructor({
     command,
     cwd,
-    useLogger = false,
+    prefixLogs = false,
     autostart = true,
     debug = false,
   }: RunProps) {
     this.command = command;
     this.cwd = cwd;
-    this.useLogger = useLogger;
+    this.prefixLogs = prefixLogs;
     this.eventBus = new EventBus({
       debug,
     });
@@ -90,7 +90,7 @@ export class Run {
   }
 
   log(message: string): void {
-    if (this.useLogger) {
+    if (this.prefixLogs) {
       logger.prefix(message);
     } else {
       logger.log(message);
@@ -106,8 +106,8 @@ export class Run {
     });
     this.pid = child.pid;
 
-    // Log events to console.log
-    if (this.useLogger) {
+    // Log process output
+    if (this.prefixLogs) {
       logger.prefixStream(child.stdout);
       logger.prefixStream(child.stderr);
     } else {
