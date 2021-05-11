@@ -15,6 +15,9 @@ const argv = yargs
     'unknown-options-as-args': true, // Make sure to pass all unknown options to the command
   })
   .env('SUPERMON')
+  .config('config')
+  .default('config', 'supermon.json')
+  .pkgConf('supermon')
   .option('watch', {
     describe: 'Directory to watch for file changes',
     default: '.',
