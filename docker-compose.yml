@@ -9,7 +9,7 @@ services:
     environment:
       - "NODE_ENV=development"
       - "FORCE_COLOR=1"
-    command: "npm run dev-test-server -- --polling"
+    command: "npm run dev-test-server -- --legacywatch"
 
 volumes:
   node_modules_data:

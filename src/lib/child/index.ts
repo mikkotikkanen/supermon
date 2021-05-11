@@ -1,4 +1,4 @@
-import runRestartable from './childRunRestartable';
-import runOnce from './childRun';
+import childProcess from './childProcess';
+import childTask from './childTask';
 
-export { runOnce, runRestartable };
+export { childTask, childProcess };

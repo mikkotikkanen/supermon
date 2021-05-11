@@ -1,11 +1,12 @@
 import { join } from 'path';
 import { existsSync } from 'fs';
 import { satisfies } from 'semver';
-import { runOnce } from '../child';
+import { childTask } from '../child';
 import dependencyDiff, { Diff } from './dependencyDiff';
 import LoadPackageJSON from './loadPackageJSON';
 import { set, get } from './store';
-import EventBus, { ModulesEvents, LogEvents } from '../EventBus';
+import EventBus, { ModulesEvents } from '../EventBus';
+import logger from '../logger/logger';
 
 type modulesProps = {
   /**
@@ -97,18 +98,19 @@ const modules = ({
         if (!storedPackageJSON) {
           // No previously stored dependencies
           if (firstRunSync) {
-            eventBus.emit(LogEvents.Message, 'First execution. Running full sync (install & prune)...');
-            await runOnce('npm install --no-audit');
-            await runOnce('npm prune');
+            // eslint-disable-next-line max-len
+            logger.prefix('First execution. Running full sync (install & prune)...');
+            await childTask('npm install --no-audit');
+            await childTask('npm prune');
           }
         } else if (storedPackageJSON && (missingDependencies.length || extraDependencies.length)) {
-          eventBus.emit(LogEvents.Message, 'Syncing dependencies...');
+          logger.prefix('Syncing dependencies...');
           // Previously stored dependencies with changes
           if (missingDependencies.length) {
-            await runOnce(`npm install ${missingDependencies.map((module) => `${module.name}@${module.version}`).join(' ')} --no-audit`);
+            await childTask(`npm install ${missingDependencies.map((module) => `${module.name}@${module.version}`).join(' ')} --no-audit`);
           }
           if (extraDependencies.length) {
-            await runOnce(`npm uninstall ${extraDependencies.map((module) => `${module.name}@${module.version}`).join(' ')}`);
+            await childTask(`npm uninstall ${extraDependencies.map((module) => `${module.name}@${module.version}`).join(' ')}`);
           }
         }
 
@@ -129,7 +131,7 @@ const modules = ({
       })
 
       .catch(() => {
-        eventBus.emit(LogEvents.Message, 'Failed dependency sync.');
+        logger.prefix('Failed dependency sync.');
       });
   });
 };
