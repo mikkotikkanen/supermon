@@ -43,6 +43,7 @@ supermon npm run server
 ## Options
 
 ```help
+
 Options:
   --watch          Directory to watch for file changes   [string] [default: "."]
   --ignore         Directories to ignore for file changes                [array]
@@ -55,16 +56,55 @@ Options:
   --help           Show help                                           [boolean]
   --debug          Show debug information                              [boolean]
 
-Note: If supermon arguments are provided, it is recommended to use "--" as separator between supermon and application command
+Note: If both, supermon and application arguments are provided, it is recommended
+      to use "--" as separator between supermon and application command & arguments.
+      Example: "supermon --watch=dist -- app.js --port=80"
 
 Note: Boolean options do not require value to be specified
-
-Note: All options can also be configured through environment variables with
-      "SUPERMON_" prefix. (fe. "SUPERMON_LEGACYWATCH=true")
 
 Example use: "supermon app.js"
 Example use: "supermon --watch=dist -- app.js --port=80"
 ```
+
+### Config file
+
+Supermon supports setting all your options through single configuration file, `supermon.json`.
+
+__Example:__
+
+```json
+{
+  "delay": 2000
+}
+```
+
+### package.json
+
+If you want to keep your amount of config files to minimum, you can also set the options through `supermon`
+object in `package.json`.
+
+__Example:__
+
+```json
+{
+  "name": "my-awesome-project",
+  "...": "...",
+  "supermon": {
+    "delay": "2000"
+  }
+}
+```
+
+### Environment variables 
+
+All options can also be set though environment variables with `SUPERMON_` prefix.
+
+Example:
+
+```env
+SUPERMON_DELAY=2000
+```
+
 
 ## Contributing
 
