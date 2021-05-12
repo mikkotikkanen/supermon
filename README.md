@@ -88,6 +88,7 @@ __Example:__
 ```json
 {
   "name": "my-awesome-project",
+  "version": "0.0.1",
   "...": "...",
   "supermon": {
     "delay": "2000"
