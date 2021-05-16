@@ -38,8 +38,8 @@ const argv = yargs
     describe: 'Use polling instead of FS events',
     type: 'boolean',
   })
-  .option('pm', {
-    describe: "Package manager to use (fe. 'npm')",
+  .option('pmexec', {
+    describe: 'Package manager executable to use',
     default: 'npm',
     type: 'string',
   })
@@ -115,7 +115,7 @@ lib({
   command,
   ext,
   exec,
-  packageManager: args.pm,
+  packageManager: args.pmexec,
   legacywatch: args.legacywatch,
   skipFirstSync: args.skipfirstsync,
   watch: args.watch,
