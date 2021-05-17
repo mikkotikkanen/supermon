@@ -1,13 +1,13 @@
 <h1 align="center">
-  <img width="600" src="https://raw.githubusercontent.com/mikkotikkanen/supermon/master/supermon_logo.png">
+  <img width="400" src="https://raw.githubusercontent.com/mikkotikkanen/supermon/master/supermon_logo.png">
 </h1>
 
 <p align="center">
   <img width="1432" src="https://raw.githubusercontent.com/mikkotikkanen/supermon/master/screenshot.png">
 </p>
 
-![alt](https://github.com/mikkotikkanen/supermon/workflows/CI/badge.svg)
-
+[![npm version](https://badge.fury.io/js/supermon.svg)](https://badge.fury.io/js/supermon)
+[![build](https://github.com/mikkotikkanen/supermon/actions/workflows/npm-test.yml/badge.svg)](https://github.com/mikkotikkanen/supermon/actions/workflows/npm-test.yml)
 
 Ease your Node.js development by _automatically restarting your application on file changes_ and
 _solve the notorious Docker node_modules sync issue_ as supermon monitors package.json file and
