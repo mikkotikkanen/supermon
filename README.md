@@ -1,4 +1,6 @@
-# supermon
+<h1 align="center">
+  <img width="600" src="https://raw.githubusercontent.com/mikkotikkanen/supermon/master/supermon_logo.png">
+</h1>
 
 <p align="center">
   <img width="1432" src="https://raw.githubusercontent.com/mikkotikkanen/supermon/master/screenshot.png">
