@@ -1,5 +1,5 @@
 <h1 align="center">
-  <img width="1060" src="https://raw.githubusercontent.com/mikkotikkanen/supermon/feat/readme-improvements/supermon_logo.png">
+  <img width="800" src="https://raw.githubusercontent.com/mikkotikkanen/supermon/feat/readme-improvements/supermon_logo.png">
 </h1>
 
 <p align="center">
