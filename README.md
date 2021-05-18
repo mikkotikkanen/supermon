@@ -3,7 +3,7 @@
 </h1>
 
 <p align="center">
-  <img width="1432" src="https://raw.githubusercontent.com/mikkotikkanen/supermon/master/screenshot.png">
+  <img width="1432" src="https://raw.githubusercontent.com/mikkotikkanen/supermon/master/supermon_screencast.gif">
 </p>
 
 [![npm version](https://badge.fury.io/js/supermon.svg)](https://badge.fury.io/js/supermon)
