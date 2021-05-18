@@ -47,12 +47,14 @@ supermon npm run server
 ```help
 
 Options:
+  --config         Path to JSON config file           [default: "supermon.json"]
   --watch          Directory to watch for file changes   [string] [default: "."]
   --ignore         Directories to ignore for file changes                [array]
   --ext            Comma separated list of file extensions to watch      [array]
   --delay          How many ms to wait after file changes[number] [default: 200]
   --exec           Executable to run the command on                     [string]
   --legacywatch    Use polling instead of FS events                    [boolean]
+  --pmexec         Package manager executable to use   [string] [default: "npm"]
   --skipfirstsync  Don't do full sync on first run                     [boolean]
   --version        Show version number                                 [boolean]
   --help           Show help                                           [boolean]
