@@ -62,12 +62,12 @@ Options:
 
 Note: If both, supermon and application arguments are provided, it is recommended
       to use "--" as separator between supermon and application command & arguments.
-      Example: "supermon --watch=dist -- app.js --port=80"
+      Example: "supermon --delay=2000 -- app.js --port=80"
 
 Note: Boolean options do not require value to be specified
 
 Example use: "supermon app.js"
-Example use: "supermon --watch=dist -- app.js --port=80"
+Example use: "supermon --delay=2000 -- app.js --port=80"
 ```
 
 ### Config file

@@ -82,12 +82,12 @@ if (yargs.argv.help) {
   console.log('');
   console.log('Note: If both, supermon and application arguments are provided, it is recommended');
   console.log('      to use "--" as separator between supermon and application command & arguments.');
-  console.log('      Example: "supermon --watch=dist -- app.js --port=80"');
+  console.log('      Example: "supermon --delay=2000 -- app.js --port=80"');
   console.log('');
   console.log('Note: Boolean options do not require value to be specified');
   console.log('');
   console.log('Example use: "supermon app.js"');
-  console.log('Example use: "supermon --watch=dist -- app.js --port=80"');
+  console.log('Example use: "supermon --delay=2000 -- app.js --port=80"');
   process.exit(); /* eslint-disable-line no-process-exit */
 }
 
