@@ -18,6 +18,11 @@ type modulesProps = {
    * Wheter or not do to the first run full sync
    */
   firstRunSync: boolean;
+
+  /**
+   * Package manager (fe. "npm", "yarn", "pnpm")
+   */
+  pmExec?: string;
 }
 
 const cwd = '.';
@@ -27,6 +32,7 @@ const nodeModulesPath = join(cwd, 'node_modules');
 
 const modules = ({
   eventBus,
+  pmExec = 'npm',
   firstRunSync = true,
 }: modulesProps): void => {
   eventBus.on(ModulesEvents.Install, () => {
@@ -100,17 +106,17 @@ const modules = ({
           if (firstRunSync) {
             // eslint-disable-next-line max-len
             logger.prefix('First execution. Running full sync (install & prune)...');
-            await childTask('npm install --no-audit');
-            await childTask('npm prune');
+            await childTask(`${pmExec} install --no-audit`);
+            await childTask(`${pmExec} prune`);
           }
         } else if (storedPackageJSON && (missingDependencies.length || extraDependencies.length)) {
           logger.prefix('Syncing dependencies...');
           // Previously stored dependencies with changes
           if (missingDependencies.length) {
-            await childTask(`npm install ${missingDependencies.map((module) => `${module.name}@${module.version}`).join(' ')} --no-audit`);
+            await childTask(`${pmExec} install ${missingDependencies.map((module) => `${module.name}@${module.version}`).join(' ')} --no-audit`);
           }
           if (extraDependencies.length) {
-            await childTask(`npm uninstall ${extraDependencies.map((module) => `${module.name}@${module.version}`).join(' ')}`);
+            await childTask(`${pmExec} uninstall ${extraDependencies.map((module) => `${module.name}@${module.version}`).join(' ')}`);
           }
         }
 

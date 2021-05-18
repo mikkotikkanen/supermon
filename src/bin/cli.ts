@@ -46,6 +46,11 @@ const argv = yargs
     describe: 'Use polling instead of FS events',
     type: 'boolean',
   })
+  .option('pmexec', {
+    describe: 'Package manager executable to use',
+    default: 'npm',
+    type: 'string',
+  })
   .option('skipfirstsync', {
     describe: "Don't do full sync on first run",
     type: 'boolean',
@@ -77,12 +82,12 @@ if (yargs.argv.help) {
   console.log('');
   console.log('Note: If both, supermon and application arguments are provided, it is recommended');
   console.log('      to use "--" as separator between supermon and application command & arguments.');
-  console.log('      Example: "supermon --watch=dist -- app.js --port=80"');
+  console.log('      Example: "supermon --delay=2000 -- app.js --port=80"');
   console.log('');
   console.log('Note: Boolean options do not require value to be specified');
   console.log('');
   console.log('Example use: "supermon app.js"');
-  console.log('Example use: "supermon --watch=dist -- app.js --port=80"');
+  console.log('Example use: "supermon --delay=2000 -- app.js --port=80"');
   process.exit(); /* eslint-disable-line no-process-exit */
 }
 
@@ -117,6 +122,7 @@ lib({
   command,
   ext,
   exec,
+  pmExec: args.pmexec,
   ignore: args.ignore,
   legacywatch: args.legacywatch,
   skipFirstSync: args.skipfirstsync,

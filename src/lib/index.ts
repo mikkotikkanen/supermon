@@ -74,6 +74,11 @@ export interface LibProps {
    * Directory to watch file events for
    */
   watch?: string;
+
+  /**
+   * Package manager (fe. "npm", "yarn", "pnpm")
+   */
+  pmExec?: string;
 }
 
 
@@ -96,9 +101,10 @@ export default ({
   delay = 200,
   exec = 'node',
   ext = ['js', 'mjs', 'jsx', 'json'],
-  skipFirstSync = false,
-  logging = true,
   legacywatch = false,
+  logging = true,
+  skipFirstSync = false,
+  pmExec = 'npm',
   watch: watchdir = '.',
   ignore = [],
 }: LibProps): EventBus => {
@@ -144,6 +150,7 @@ export default ({
   modules({
     eventBus,
     firstRunSync: !skipFirstSync,
+    pmExec,
   });
   eventBus.on(ModulesEvents.Install, () => {
     eventBus.emit(WatchEvents.Disable);
