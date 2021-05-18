@@ -78,7 +78,7 @@ export interface LibProps {
   /**
    * Package manager (fe. "npm", "yarn", "pnpm")
    */
-  packageManager?: string;
+  pmExec?: string;
 }
 
 
@@ -104,7 +104,7 @@ export default ({
   legacywatch = false,
   logging = true,
   skipFirstSync = false,
-  packageManager = 'npm',
+  pmExec = 'npm',
   watch: watchdir = '.',
   ignore = [],
 }: LibProps): EventBus => {
@@ -150,7 +150,7 @@ export default ({
   modules({
     eventBus,
     firstRunSync: !skipFirstSync,
-    packageManager,
+    pmExec,
   });
   eventBus.on(ModulesEvents.Install, () => {
     eventBus.emit(WatchEvents.Disable);

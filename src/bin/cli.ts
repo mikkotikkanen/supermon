@@ -122,7 +122,7 @@ lib({
   command,
   ext,
   exec,
-  packageManager: args.pmexec,
+  pmExec: args.pmexec,
   ignore: args.ignore,
   legacywatch: args.legacywatch,
   skipFirstSync: args.skipfirstsync,
