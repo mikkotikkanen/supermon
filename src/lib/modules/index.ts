@@ -1,11 +1,12 @@
 import { join } from 'path';
 import { existsSync } from 'fs';
 import { satisfies } from 'semver';
-import { runOnce } from '../child';
+import { childTask } from '../child';
 import dependencyDiff, { Diff } from './dependencyDiff';
 import LoadPackageJSON from './loadPackageJSON';
 import { set, get } from './store';
-import EventBus, { ModulesEvents, LogEvents } from '../EventBus';
+import EventBus, { ModulesEvents } from '../EventBus';
+import logger from '../logger/logger';
 
 type modulesProps = {
   /**
@@ -103,18 +104,19 @@ const modules = ({
         if (!storedPackageJSON) {
           // No previously stored dependencies
           if (firstRunSync) {
-            eventBus.emit(LogEvents.Message, 'First execution. Running full sync (install & prune)...');
-            await runOnce(`${packageManager} install --no-audit`);
-            await runOnce(`${packageManager} prune`);
+            // eslint-disable-next-line max-len
+            logger.prefix('First execution. Running full sync (install & prune)...');
+            await childTask(`${packageManager} install --no-audit`);
+            await childTask(`${packageManager} prune`);
           }
         } else if (storedPackageJSON && (missingDependencies.length || extraDependencies.length)) {
-          eventBus.emit(LogEvents.Message, 'Syncinc dependencies...');
+          logger.prefix('Syncing dependencies...');
           // Previously stored dependencies with changes
           if (missingDependencies.length) {
-            await runOnce(`${packageManager} install ${missingDependencies.map((module) => `${module.name}@${module.version}`).join(' ')} --no-audit`);
+            await childTask(`${packageManager} install ${missingDependencies.map((module) => `${module.name}@${module.version}`).join(' ')} --no-audit`);
           }
           if (extraDependencies.length) {
-            await runOnce(`${packageManager} uninstall ${extraDependencies.map((module) => `${module.name}@${module.version}`).join(' ')}`);
+            await childTask(`${packageManager} uninstall ${extraDependencies.map((module) => `${module.name}@${module.version}`).join(' ')}`);
           }
         }
 
@@ -135,7 +137,7 @@ const modules = ({
       })
 
       .catch(() => {
-        eventBus.emit(LogEvents.Message, 'Failed dependency sync.');
+        logger.prefix('Failed dependency sync.');
       });
   });
 };

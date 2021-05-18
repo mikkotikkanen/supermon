@@ -1,15 +1,17 @@
 import treeKill from 'tree-kill';
 import { existsSync } from 'fs';
+import { join } from 'path';
 import modules from './modules';
 import watch from './watch';
-import { runRestartable } from './child';
-import logger from './logger';
+import { childProcess } from './child';
 import EventBus, {
   ChildEvents,
   ModulesEvents,
   ProcessEvents,
   WatchEvents,
 } from './EventBus';
+import logger from './logger/logger';
+import loadPackageJSON from './modules/loadPackageJSON';
 
 
 export interface LibProps {
@@ -45,16 +47,21 @@ export interface LibProps {
   ext?: string[];
 
   /**
-   * Use polling instead of file system events
-   *
-   * Useful for fe. running on Docker container where FS events arent propagated to host
+   * Which file paths to ignore
    */
-  legacywatch?: boolean;
+  ignore?: string[];
 
   /**
    * Log things to console
    */
   logging?: boolean;
+
+  /**
+   * Use polling instead of file system events
+   *
+   * Useful for fe. running on Docker container where FS events arent propagated to host
+   */
+  legacywatch?: boolean;
 
   /**
    * Wheter or not to do full sync on first run
@@ -64,20 +71,24 @@ export interface LibProps {
   skipFirstSync?: boolean;
 
   /**
-   * Package manager (fe. "npm", "yarn", "pnpm")
-   */
-  packageManager?: string;
-
-  /**
    * Directory to watch file events for
    */
   watch?: string;
+
+  /**
+   * Package manager (fe. "npm", "yarn", "pnpm")
+   */
+  packageManager?: string;
 }
 
 
 let isStarted = false;
 let isBeingKilled = false;
 
+const pckg = loadPackageJSON(join(__dirname, '..', '..', 'package.json'));
+if (!pckg) {
+  throw new Error('Failed to load module package.json');
+}
 
 /**
  * Setup main process
@@ -95,6 +106,7 @@ export default ({
   skipFirstSync = false,
   packageManager = 'npm',
   watch: watchdir = '.',
+  ignore = [],
 }: LibProps): EventBus => {
   const eventBus = new EventBus({
     debug,
@@ -104,11 +116,8 @@ export default ({
     throw new Error(`Path "${watchdir}" does not exist.`);
   }
 
-  if (logging) {
-    logger({
-      eventBus,
-    });
-  }
+  // Enable/disable logger
+  logger.enabled(logging);
 
   const props: LibProps = {
     command,
@@ -124,9 +133,10 @@ export default ({
   watch({
     eventBus,
     cwd: watchdir,
-    polling: legacywatch,
     extensions: ext,
     delay,
+    ignore,
+    polling: legacywatch,
   });
   eventBus.on(WatchEvents.FilesChanged, () => {
     // Only start emitting watch events once the child process is running
@@ -159,7 +169,7 @@ export default ({
 
 
   // Setup the requested command
-  runRestartable({
+  childProcess({
     eventBus,
     command: `${exec} ${command}`,
   });
@@ -183,6 +193,20 @@ export default ({
   eventBus.on(ChildEvents.Stop, () => {
     isBeingKilled = true;
   });
+  eventBus.on(ChildEvents.Stopped, () => {
+    logger.prefix('Child process exited.');
+  });
+
+  logger.prefix();
+  logger.prefix(`v${pckg.version}`);
+  logger.prefix(`Child process: ${exec} ${command}`);
+  logger.prefix(`Watching directory: ${watchdir}`);
+  logger.prefix(`Watching extensions: ${ext?.join(',')}`);
+  logger.prefix(`Watch delay: ${delay}ms`);
+  if (legacywatch) {
+    logger.prefix('Using legacywatch');
+  }
+  logger.prefix();
 
   return eventBus;
 };

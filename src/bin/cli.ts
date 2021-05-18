@@ -15,10 +15,18 @@ const argv = yargs
     'unknown-options-as-args': true, // Make sure to pass all unknown options to the command
   })
   .env('SUPERMON')
+  .config('config')
+  .default('config', 'supermon.json')
+  .pkgConf('supermon')
   .option('watch', {
     describe: 'Directory to watch for file changes',
     default: '.',
     type: 'string',
+  })
+  .option('ignore', {
+    describe: 'Directories to ignore for file changes',
+    type: 'string',
+    array: true,
   })
   .option('ext', {
     describe: 'Comma separated list of file extensions to watch',
@@ -72,12 +80,11 @@ if (yargs.argv.version) {
 if (yargs.argv.help) {
   yargs.showHelp('log');
   console.log('');
-  console.log('Note: If supermon arguments are provided, it is recommended to use "--" as separator between supermon and application command');
+  console.log('Note: If both, supermon and application arguments are provided, it is recommended');
+  console.log('      to use "--" as separator between supermon and application command & arguments.');
+  console.log('      Example: "supermon --watch=dist -- app.js --port=80"');
   console.log('');
   console.log('Note: Boolean options do not require value to be specified');
-  console.log('');
-  console.log('Note: All options can also be configured through environment variables with');
-  console.log('      "SUPERMON_" prefix. (fe. "SUPERMON_LEGACYWATCH=true")');
   console.log('');
   console.log('Example use: "supermon app.js"');
   console.log('Example use: "supermon --watch=dist -- app.js --port=80"');
@@ -116,6 +123,7 @@ lib({
   ext,
   exec,
   packageManager: args.pmexec,
+  ignore: args.ignore,
   legacywatch: args.legacywatch,
   skipFirstSync: args.skipfirstsync,
   watch: args.watch,

@@ -8,7 +8,8 @@ services:
       - "node_modules_data:/usr/src/app/node_modules" # Set node_modules data volume
     environment:
       - "NODE_ENV=development"
-    command: "npm run run-test-server -- --polling"
+      - "FORCE_COLOR=1"
+    command: "npm run dev-test-server -- --legacywatch"
 
 volumes:
   node_modules_data:

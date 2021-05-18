@@ -1,9 +1,13 @@
-# supermon
+<h1 align="center">
+  <img width="400" src="https://raw.githubusercontent.com/mikkotikkanen/supermon/master/supermon_logo.png">
+</h1>
 
-![](screenshot.png)
+<p align="center">
+  <img width="1432" src="https://raw.githubusercontent.com/mikkotikkanen/supermon/master/screenshot.png">
+</p>
 
-
-![alt](https://github.com/mikkotikkanen/supermon/workflows/CI/badge.svg)
+[![npm version](https://badge.fury.io/js/supermon.svg)](https://badge.fury.io/js/supermon)
+[![build](https://github.com/mikkotikkanen/supermon/actions/workflows/npm-test.yml/badge.svg)](https://github.com/mikkotikkanen/supermon/actions/workflows/npm-test.yml)
 
 Ease your Node.js development by _automatically restarting your application on file changes_ and
 _solve the notorious Docker node_modules sync issue_ as supermon monitors package.json file and
@@ -41,8 +45,10 @@ supermon npm run server
 ## Options
 
 ```help
+
 Options:
   --watch          Directory to watch for file changes   [string] [default: "."]
+  --ignore         Directories to ignore for file changes                [array]
   --ext            Comma separated list of file extensions to watch      [array]
   --delay          How many ms to wait after file changes[number] [default: 200]
   --exec           Executable to run the command on                     [string]
@@ -52,16 +58,56 @@ Options:
   --help           Show help                                           [boolean]
   --debug          Show debug information                              [boolean]
 
-Note: If supermon arguments are provided, it is recommended to use "--" as separator between supermon and application command
+Note: If both, supermon and application arguments are provided, it is recommended
+      to use "--" as separator between supermon and application command & arguments.
+      Example: "supermon --watch=dist -- app.js --port=80"
 
 Note: Boolean options do not require value to be specified
-
-Note: All options can also be configured through environment variables with
-      "SUPERMON_" prefix. (fe. "SUPERMON_LEGACYWATCH=true")
 
 Example use: "supermon app.js"
 Example use: "supermon --watch=dist -- app.js --port=80"
 ```
+
+### Config file
+
+Supermon supports setting all your options through single configuration file, `supermon.json`.
+
+__Example:__
+
+```json
+{
+  "delay": 2000
+}
+```
+
+### package.json
+
+If you want to keep your amount of config files to minimum, you can also set the options through `supermon`
+object in `package.json`.
+
+__Example:__
+
+```json
+{
+  "name": "my-awesome-project",
+  "version": "0.0.1",
+  "...": "...",
+  "supermon": {
+    "delay": "2000"
+  }
+}
+```
+
+### Environment variables 
+
+All options can also be set though environment variables with `SUPERMON_` prefix.
+
+Example:
+
+```env
+SUPERMON_DELAY=2000
+```
+
 
 ## Contributing
 
