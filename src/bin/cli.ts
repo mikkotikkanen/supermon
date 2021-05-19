@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import yargs from 'yargs';
-import { readFileSync } from 'fs';
+import { readFileSync, existsSync } from 'fs';
 import { join, extname } from 'path';
 import updateNotifier from 'update-notifier';
 import lib from '../lib/index';
@@ -15,36 +15,65 @@ const argv = yargs
     'unknown-options-as-args': true, // Make sure to pass all unknown options to the command
   })
   .env('SUPERMON')
-  .config('config')
+  .config('config', 'Path to JSON config file', (filename: string) => {
+    // Try reading potential config file
+    let stringConfig = '';
+    if (filename && existsSync(filename)) {
+      stringConfig = readFileSync(filename, { encoding: 'utf8' });
+    } else if (existsSync('nodemon.json')) {
+      // If no config was found, try reading nodemon.json as well
+      stringConfig = readFileSync('nodemon.json', { encoding: 'utf8' });
+    }
+
+    // Try parsing the loaded file
+    let config = {};
+    if (stringConfig) {
+      try {
+        config = JSON.parse(stringConfig);
+      } catch (err) {
+        console.error('Error parsing JSON configuration:', err.toString());
+        console.error('Try using a JSON validator.');
+        process.exit(1);
+      }
+    }
+
+    return config;
+  })
   .default('config', 'supermon.json')
   .pkgConf('supermon')
+  .pkgConf('nodemonConfig') // If supermon config is not find, try nodemon instead
   .option('watch', {
     describe: 'Directory to watch for file changes',
     default: '.',
     type: 'string',
-  })
-  .option('ignore', {
-    describe: 'Directories to ignore for file changes',
-    type: 'string',
-    array: true,
+    alias: 'w',
   })
   .option('ext', {
     describe: 'Comma separated list of file extensions to watch',
     type: 'string',
     array: true,
+    alias: 'e',
+  })
+  .option('ignore', {
+    describe: 'Directories to ignore for file changes',
+    type: 'string',
+    array: true,
+    alias: 'i',
   })
   .option('delay', {
     describe: 'How many ms to wait after file changes',
-    default: 200,
+    default: 1000,
     type: 'number',
   })
   .option('exec', {
     describe: 'Executable to run the command on',
     type: 'string',
+    alias: 'x',
   })
   .option('legacywatch', {
     describe: 'Use polling instead of FS events',
     type: 'boolean',
+    alias: ['L', 'legacy-watch'],
   })
   .option('pmexec', {
     describe: 'Package manager executable to use',
@@ -68,6 +97,7 @@ const argv = yargs
   .option('debug', {
     describe: 'Show debug information',
     type: 'boolean',
+    alias: ['V', 'verbose'],
   });
 
 // Show help and version manually
@@ -100,6 +130,7 @@ if (pckg) {
 
 
 const { argv: args } = argv;
+// args.legacywatch = args.legacyWatch || args.legacywatch;
 
 let exec = args.exec || 'node';
 let command = args._.join(' ');
