@@ -22,16 +22,19 @@ const argv = yargs
     describe: 'Directory to watch for file changes',
     default: '.',
     type: 'string',
-  })
-  .option('ignore', {
-    describe: 'Directories to ignore for file changes',
-    type: 'string',
-    array: true,
+    alias: 'w',
   })
   .option('ext', {
     describe: 'Comma separated list of file extensions to watch',
     type: 'string',
     array: true,
+    alias: 'e',
+  })
+  .option('ignore', {
+    describe: 'Directories to ignore for file changes',
+    type: 'string',
+    array: true,
+    alias: 'i',
   })
   .option('delay', {
     describe: 'How many ms to wait after file changes',
@@ -41,10 +44,12 @@ const argv = yargs
   .option('exec', {
     describe: 'Executable to run the command on',
     type: 'string',
+    alias: 'x',
   })
   .option('legacywatch', {
     describe: 'Use polling instead of FS events',
     type: 'boolean',
+    alias: ['L', 'legacy-watch'],
   })
   .option('pmexec', {
     describe: 'Package manager executable to use',
@@ -68,6 +73,7 @@ const argv = yargs
   .option('debug', {
     describe: 'Show debug information',
     type: 'boolean',
+    alias: ['V', 'verbose'],
   });
 
 // Show help and version manually
@@ -100,6 +106,7 @@ if (pckg) {
 
 
 const { argv: args } = argv;
+// args.legacywatch = args.legacyWatch || args.legacywatch;
 
 let exec = args.exec || 'node';
 let command = args._.join(' ');
