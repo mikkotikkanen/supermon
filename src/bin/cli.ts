@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import yargs from 'yargs';
-import { readFileSync } from 'fs';
+import { readFileSync, existsSync } from 'fs';
 import { join, extname } from 'path';
 import updateNotifier from 'update-notifier';
 import lib from '../lib/index';
@@ -15,9 +15,31 @@ const argv = yargs
     'unknown-options-as-args': true, // Make sure to pass all unknown options to the command
   })
   .env('SUPERMON')
-  .config('config')
+  .config('config', 'Path to JSON config file', (filename: string) => {
+    let file = '';
+    if (filename && existsSync(filename)) {
+      file = readFileSync(filename, { encoding: 'utf8' });
+    } else if (existsSync('nodemon.json')) {
+      // If no config was found, try reading nodemon.json as well
+      file = readFileSync('nodemon.json', { encoding: 'utf8' });
+    }
+
+    let config = {};
+    if (file) {
+      try {
+        config = JSON.parse(file);
+      } catch (err) {
+        console.error('Error parsing JSON configuration:', err.toString());
+        console.error('Try using a JSON validator.');
+        process.exit(1);
+      }
+    }
+
+    return config;
+  })
   .default('config', 'supermon.json')
   .pkgConf('supermon')
+  .pkgConf('nodemonConfig') // If supermon config is not find, try nodemon instead
   .option('watch', {
     describe: 'Directory to watch for file changes',
     default: '.',
