@@ -16,18 +16,20 @@ const argv = yargs
   })
   .env('SUPERMON')
   .config('config', 'Path to JSON config file', (filename: string) => {
-    let file = '';
+    // Try reading potential config file
+    let stringConfig = '';
     if (filename && existsSync(filename)) {
-      file = readFileSync(filename, { encoding: 'utf8' });
+      stringConfig = readFileSync(filename, { encoding: 'utf8' });
     } else if (existsSync('nodemon.json')) {
       // If no config was found, try reading nodemon.json as well
-      file = readFileSync('nodemon.json', { encoding: 'utf8' });
+      stringConfig = readFileSync('nodemon.json', { encoding: 'utf8' });
     }
 
+    // Try parsing the loaded file
     let config = {};
-    if (file) {
+    if (stringConfig) {
       try {
-        config = JSON.parse(file);
+        config = JSON.parse(stringConfig);
       } catch (err) {
         console.error('Error parsing JSON configuration:', err.toString());
         console.error('Try using a JSON validator.');
