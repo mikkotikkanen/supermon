@@ -31,7 +31,6 @@ npm install ts-node --save-dev
 
 ```bash
 supermon [application file]
-supermon [npm script command]
 ```
 
 Examples
@@ -39,7 +38,8 @@ Examples
 ```bash
 supermon app.js
 supermon app.ts
-supermon npm run server
+supermon --delay=2000 app.ts
+supermon --delay=2000 -- app.ts --port=80
 ```
 
 ## Options
