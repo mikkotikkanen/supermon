@@ -60,7 +60,7 @@ const argv = yargs
   })
   .option('delay', {
     describe: 'How many ms to wait after file changes',
-    default: 200,
+    default: 1000,
     type: 'number',
   })
   .option('exec', {
