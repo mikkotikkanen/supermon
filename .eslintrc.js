@@ -29,6 +29,7 @@ module.exports = {
     ],
     'no-shadow': 'off', // Turn off regular no-shadow since it causes false positives with enums
     '@typescript-eslint/no-shadow': ['error'], // Turn on TS specific no-shadow
+    'import/no-extraneous-dependencies': ['error', { devDependencies: ['src/test/**/*'] }],
   },
   settings: {
     'import/resolver': {
