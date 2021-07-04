@@ -104,7 +104,9 @@ export class Run {
       shell: true,
       stdio: 'pipe',
     });
-    this.pid = child.pid;
+    if (child.pid) {
+      this.pid = child.pid;
+    }
 
     // Log process output
     if (this.prefixLogs) {
