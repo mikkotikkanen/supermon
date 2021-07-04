@@ -101,13 +101,13 @@ const argv = yargs
   });
 
 // Show help and version manually
-if (yargs.argv.version) {
+if (argv.arguments.version) {
   const packageJsonString = readFileSync(join(__dirname, '../../package.json'), { encoding: 'utf8' });
   const packageJson = JSON.parse(packageJsonString);
   console.log(packageJson.version);
   process.exit(); /* eslint-disable-line no-process-exit */
 }
-if (yargs.argv.help) {
+if (argv.arguments.help) {
   yargs.showHelp('log');
   console.log('');
   console.log('Note: If both, supermon and application arguments are provided, it is recommended');
@@ -129,7 +129,7 @@ if (pckg) {
 }
 
 
-const { argv: args } = argv;
+const { arguments: args } = argv;
 // args.legacywatch = args.legacyWatch || args.legacywatch;
 
 let exec = args.exec || 'node';
